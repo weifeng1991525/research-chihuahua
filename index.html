@@ -936,6 +936,100 @@
             flex: 1;
             min-width: 100px;
         }
+    
+        /* ===== Hypothesis Expandable ===== */
+        .hypothesis-box {
+            background: linear-gradient(135deg, #e8f4fd 0%, #f0f7ff 100%);
+            border: 1px solid var(--primary-blue-light);
+            border-radius: var(--radius);
+            padding: var(--spacing);
+            margin-bottom: var(--spacing);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .hypothesis-box:hover { border-color: var(--primary-blue); }
+        .hypothesis-box.open { border-color: var(--primary-blue); background: #e3f0ff; }
+        .hypothesis-header {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .hypothesis-title {
+            font-size: 0.9rem; font-weight: 600; color: var(--primary-blue-dark);
+        }
+        .hypothesis-arrow {
+            font-size: 0.8rem; color: var(--gray-500); transition: transform 0.3s;
+        }
+        .hypothesis-box.open .hypothesis-arrow { transform: rotate(90deg); }
+        .hypothesis-detail {
+            display: none; margin-top: var(--spacing); padding-top: var(--spacing-sm);
+            border-top: 1px solid rgba(26,95,180,0.15);
+        }
+        .hypothesis-box.open .hypothesis-detail { display: block; }
+        .indicator-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm);
+        }
+        .indicator-card {
+            background: var(--white); border-radius: var(--radius-sm);
+            padding: var(--spacing-sm); font-size: 0.8rem;
+            border-left: 3px solid var(--primary-blue);
+        }
+        .indicator-name { font-weight: 500; color: var(--gray-700); margin-bottom: 2px; }
+        .indicator-change { font-weight: 600; }
+        .indicator-up { color: var(--success); }
+        .indicator-down { color: var(--danger); }
+        .indicator-neutral { color: var(--warning); }
+
+        /* ===== Personalized Learning ===== */
+        .learning-plan {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f8f0 100%);
+            border: 1px solid #86efac; border-radius: var(--radius);
+            padding: var(--spacing); margin-bottom: var(--spacing);
+        }
+        .learning-plan-title {
+            font-size: 0.9rem; font-weight: 600; color: #166534;
+            margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: var(--spacing-xs);
+        }
+        .learning-tags { display: flex; flex-wrap: wrap; gap: var(--spacing-xs); }
+        .learning-tag {
+            background: var(--white); border: 1px solid #86efac;
+            border-radius: 20px; padding: 2px 10px; font-size: 0.75rem; color: #166534;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .learning-tag:hover { background: #166534; color: var(--white); }
+        .learning-tag.recommended { background: #166534; color: var(--white); font-weight: 500; }
+
+        /* ===== SOP Guide in Steps ===== */
+        .sop-guide {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef9e7 100%);
+            border: 1px solid #fbbf24; border-radius: var(--radius);
+            margin-bottom: var(--spacing); overflow: hidden;
+        }
+        .sop-guide-header {
+            padding: var(--spacing-sm) var(--spacing);
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #92400e;
+        }
+        .sop-guide-header:hover { background: rgba(251,191,36,0.1); }
+        .sop-guide-toggle {
+            font-size: 0.75rem; color: var(--gray-500); transition: transform 0.3s;
+        }
+        .sop-guide.open .sop-guide-toggle { transform: rotate(180deg); }
+        .sop-guide-body {
+            display: none; padding: 0 var(--spacing) var(--spacing);
+            font-size: 0.8rem; color: var(--gray-700); line-height: 1.8;
+        }
+        .sop-guide.open .sop-guide-body { display: block; }
+        .sop-guide-body ol { padding-left: var(--spacing-lg); }
+        .sop-guide-body li { margin-bottom: 4px; }
+        .sop-guide-body .tip {
+            background: #fef3c7; border-radius: var(--radius-sm);
+            padding: var(--spacing-sm); margin-top: var(--spacing-sm);
+            font-size: 0.75rem; color: #92400e;
+        }
+
+        /* ===== Simplified Form ===== */
+        .form-group.compact { margin-bottom: var(--spacing-sm); }
+        .form-group.compact textarea { min-height: 60px; }
+
     </style>
 </head>
 <body>
@@ -1241,7 +1335,18 @@
                             lastExpDate: '2024-01-15',
                             riskLevel: 'medium',
                             riskNote: '动物实验进行中，需注意动物伦理和生物安全',
-                            createdAt: '2024-01-01T00:00:00Z'
+                            createdAt: '2024-01-01T00:00:00Z',
+                            expectedIndicators: [
+                                {name: 'p-AKT (Ser473)', change: 'up', detail: '耐药细胞中磷酸化AKT水平显著升高'},
+                                {name: 'p-PI3K (p85)', change: 'up', detail: 'PI3K催化亚基磷酸化增强'},
+                                {name: 'p-mTOR', change: 'up', detail: '下游mTOR信号激活'},
+                                {name: 'PTEN蛋白', change: 'down', detail: '抑癌蛋白PTEN表达下降或缺失'},
+                                {name: '细胞增殖(CCK-8)', change: 'up', detail: '耐药细胞增殖速率加快'},
+                                {name: '细胞凋亡(Annexin V)', change: 'down', detail: '耐药细胞凋亡率降低'},
+                                {name: 'HER2蛋白表达', change: 'neutral', detail: 'HER2表达水平可能不变'},
+                                {name: '肿瘤生长速度', change: 'up', detail: '体内耐药组肿瘤生长更快'}
+                            ],
+                            relatedSOPs: ['mol-008','mol-006','mol-004','cell-005','cell-010','ani-006']
                         },
                         {
                             id: 'PRJ-2024-002',
@@ -1256,7 +1361,18 @@
                             lastExpDate: '2024-01-12',
                             riskLevel: 'high',
                             riskNote: '涉及人体样本，必须严格脱敏处理',
-                            createdAt: '2024-01-05T00:00:00Z'
+                            createdAt: '2024-01-05T00:00:00Z',
+                            expectedIndicators: [
+                                {name: 'CD8+ T细胞比例', change: 'up', detail: '应答组肿瘤浸润CD8+ T细胞显著增多'},
+                                {name: 'PD-L1表达(TPS)', change: 'up', detail: '应答组PD-L1 TPS评分更高'},
+                                {name: 'TMB(肿瘤突变负荷)', change: 'up', detail: '高TMB与免疫治疗应答正相关'},
+                                {name: 'IFN-γ表达', change: 'up', detail: 'Th1型免疫微环境特征'},
+                                {name: 'Treg细胞比例', change: 'down', detail: '应答组免疫抑制细胞比例降低'},
+                                {name: 'PD-1+ CD8+ T细胞', change: 'neutral', detail: '耗竭T细胞比例需综合评估'},
+                                {name: '无进展生存期(PFS)', change: 'up', detail: '标志物阳性组PFS延长'},
+                                {name: '客观缓解率(ORR)', change: 'up', detail: '标志物阳性组ORR提高'}
+                            ],
+                            relatedSOPs: ['mol-011','mol-009','mol-001','om-007','om-002','cli-001','cli-006']
                         },
                         {
                             id: 'PRJ-2024-003',
@@ -1271,7 +1387,18 @@
                             lastExpDate: '2024-01-18',
                             riskLevel: 'low',
                             riskNote: '细胞实验进展顺利，即将进入动物实验',
-                            createdAt: '2023-12-15T00:00:00Z'
+                            createdAt: '2023-12-15T00:00:00Z',
+                            expectedIndicators: [
+                                {name: 'p-AMPK (Thr172)', change: 'up', detail: '药物激活后AMPK磷酸化水平升高'},
+                                {name: 'nephrin蛋白', change: 'up', detail: '足细胞裂孔隔膜蛋白恢复'},
+                                {name: 'podocin蛋白', change: 'up', detail: '足细胞标志蛋白表达恢复'},
+                                {name: '足细胞凋亡(Annexin V)', change: 'down', detail: '药物干预后凋亡率降低'},
+                                {name: 'ROS水平', change: 'down', detail: '氧化应激水平下降'},
+                                {name: 'mTOR活性', change: 'down', detail: 'AMPK激活抑制下游mTOR'},
+                                {name: 'TGF-β/Smad信号', change: 'down', detail: '纤维化通路受抑制'},
+                                {name: '尿蛋白/肌酐比', change: 'down', detail: '体内药物组尿蛋白减少'}
+                            ],
+                            relatedSOPs: ['mol-008','mol-006','mol-004','cell-005','cell-010','cell-014','ani-006']
                         }
                     ];
                     localStorage.setItem('rc_projects', JSON.stringify(sampleProjects));
@@ -1869,6 +1996,28 @@
         // ===== Page 2: Project Detail =====
         function renderProjectOverview() {
             const container = document.getElementById('projectOverview');
+            const indicators = currentProject.expectedIndicators || [];
+            const relatedSOPs = currentProject.relatedSOPs || [];
+
+            // Build personalized learning recommendations
+            const learningPlan = buildLearningPlan(relatedSOPs);
+
+            // Build indicator cards
+            let indicatorHTML = '';
+            if (indicators.length > 0) {
+                const changeIcon = {up: '📈', down: '📉', neutral: '➡️'};
+                const changeText = {up: '预期升高', down: '预期降低', neutral: '预期不变'};
+                indicatorHTML = indicators.map(ind => `
+                    <div class="indicator-card">
+                        <div class="indicator-name">${ind.name}</div>
+                        <div class="indicator-change indicator-${ind.change}">
+                            ${changeIcon[ind.change]} ${changeText[ind.change]}
+                        </div>
+                        <div style="font-size:0.7rem;color:var(--gray-500);margin-top:2px;">${ind.detail}</div>
+                    </div>
+                `).join('');
+            }
+
             container.innerHTML = `
                 <div class="card">
                     <div class="card-body">
@@ -1882,8 +2031,31 @@
                         </div>
                         <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: var(--spacing);">
                             <p><strong>研究目的：</strong>${currentProject.purpose}</p>
-                            <p style="margin-top: var(--spacing-sm);"><strong>研究假设：</strong>${currentProject.hypothesis}</p>
                         </div>
+
+                        ${indicators.length > 0 ? `
+                        <div class="hypothesis-box" onclick="toggleHypothesis(this)">
+                            <div class="hypothesis-header">
+                                <div class="hypothesis-title">🧪 ${currentProject.hypothesis}</div>
+                                <span class="hypothesis-arrow">▶</span>
+                            </div>
+                            <div class="hypothesis-detail">
+                                <p style="font-size:0.8rem;color:var(--gray-600);margin-bottom:var(--spacing-sm);">
+                                    点击展开查看各指标的预期变化方向：
+                                </p>
+                                <div class="indicator-grid">
+                                    ${indicatorHTML}
+                                </div>
+                            </div>
+                        </div>
+                        ` : `
+                        <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: var(--spacing);">
+                            <p><strong>研究假设：</strong>${currentProject.hypothesis}</p>
+                        </div>
+                        `}
+
+                        ${learningPlan}
+
                         <div class="progress-section">
                             <div class="progress-header">
                                 <span>当前阶段：${currentProject.stage}</span>
@@ -1894,6 +2066,40 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            `;
+        }
+
+        function toggleHypothesis(el) {
+            el.classList.toggle('open');
+        }
+
+        function buildLearningPlan(relatedSOPs) {
+            if (!relatedSOPs || relatedSOPs.length === 0) return '';
+            // Find SOP details from all categories
+            let sopItems = [];
+            SOPData.categories.forEach(cat => {
+                cat.sops.forEach(sop => {
+                    if (relatedSOPs.includes(sop.id)) {
+                        sopItems.push({id: sop.id, name: sop.name, cat: cat.name, icon: cat.icon});
+                    }
+                });
+            });
+            if (sopItems.length === 0) return '';
+
+            return `
+                <div class="learning-plan">
+                    <div class="learning-plan-title">📚 推荐学习内容（基于项目假说规划）</div>
+                    <div class="learning-tags">
+                        ${sopItems.map(s => `
+                            <span class="learning-tag recommended" onclick="showSOPDetail('${s.id}', '${s.name}')">
+                                ${s.icon} ${s.name}
+                            </span>
+                        `).join('')}
+                    </div>
+                    <p style="font-size:0.7rem;color:#166534;margin-top:var(--spacing-sm);">
+                        💡 点击标签可直接查看操作手册，推荐优先学习标记项
+                    </p>
                 </div>
             `;
         }
@@ -2116,22 +2322,27 @@
         // ===== Page 3: SOP List =====
         function showSOPList() {
             const container = document.getElementById('sopCategories');
+            const relatedSOPs = (currentProject.relatedSOPs || []);
 
             container.innerHTML = SOPData.categories.map(cat => `
                 <div class="sop-category">
                     <div class="sop-category-title">${cat.icon} ${cat.name}</div>
                     <div class="card">
                         <ul class="list-group">
-                            ${cat.sops.map(sop => `
-                                <li class="list-item" onclick="showSOPDetail('${sop.id}', '${sop.name}')">
-                                    <div class="list-icon" style="background: var(--info-light);">📄</div>
+                            ${cat.sops.map(sop => {
+                                const isRec = relatedSOPs.includes(sop.id);
+                                return `
+                                <li class="list-item" onclick="showSOPDetail('${sop.id}', '${sop.name}')" style="${isRec ? 'background:#f0fdf4;' : ''}">
+                                    <div class="list-icon" style="background: ${isRec ? 'var(--success-light)' : 'var(--info-light)'};">
+                                        ${isRec ? '⭐' : '📄'}
+                                    </div>
                                     <div class="list-content">
-                                        <div class="list-title">${sop.name}</div>
+                                        <div class="list-title">${sop.name} ${isRec ? '<span style="font-size:0.7rem;color:var(--success);font-weight:600;">推荐</span>' : ''}</div>
                                         <div class="list-subtitle">${sop.desc}</div>
                                     </div>
                                     <span class="list-arrow">›</span>
-                                </li>
-                            `).join('')}
+                                </li>`;
+                            }).join('')}
                         </ul>
                     </div>
                 </div>
@@ -2385,48 +2596,43 @@
         }
 
         function renderStep1(savedData) {
+            const sopGuide = getSOPGuideForStep(1);
             return `
-                <div class="alert alert-warning">
-                    <strong>⚠️ 关键记录点 1</strong><br>
-                    请拍照或录像记录实验前准备状态
+                <div class="sop-guide" id="sopGuide1">
+                    <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide1')">
+                        <span>📖 操作手册关键步骤指导</span>
+                        <span class="sop-guide-toggle">▼</span>
+                    </div>
+                    <div class="sop-guide-body">
+                        ${sopGuide}
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">核对SOP <span class="required">*</span></label>
-                    <select class="form-control" id="sopVerified" required>
+                <div class="alert alert-warning">
+                    <strong>⚠️ 关键记录点 1</strong> — 请拍照记录实验前准备状态
+                </div>
+
+                <div class="form-group compact">
+                    <label class="form-label">SOP核对 <span class="required">*</span></label>
+                    <select class="form-control" id="sopVerified">
                         <option value="">请选择</option>
-                        <option value="yes" ${savedData.sopVerified === 'yes' ? 'selected' : ''}>✅ 已核对SOP</option>
+                        <option value="yes" ${savedData.sopVerified === 'yes' ? 'selected' : ''}>✅ 已核对</option>
                         <option value="no" ${savedData.sopVerified === 'no' ? 'selected' : ''}>❌ 未核对</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">样本信息核对</label>
-                    <textarea class="form-control" id="sampleCheck" rows="2" placeholder="记录样本编号、数量、状态...">${savedData.sampleCheck || ''}</textarea>
+                <div class="form-group compact">
+                    <label class="form-label">样本与试剂</label>
+                    <input type="text" class="form-control" id="sampleCheck" placeholder="样本编号、试剂批号(一行简记)" value="${savedData.sampleCheck || ''}">
+                </div>
+
+                <div class="form-group compact">
+                    <label class="form-label">仪器状态</label>
+                    <input type="text" class="form-control" id="equipmentStatus" placeholder="仪器是否正常(简记)" value="${savedData.equipmentStatus || ''}">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">试剂批号记录</label>
-                    <textarea class="form-control" id="reagentBatch" rows="2" placeholder="记录关键试剂名称、批号、有效期...">${savedData.reagentBatch || ''}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">仪器状态检查</label>
-                    <textarea class="form-control" id="equipmentStatus" rows="2" placeholder="记录仪器名称、状态、校准日期...">${savedData.equipmentStatus || ''}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">伦理与生物安全要求</label>
-                    <select class="form-control" id="ethicsCheck">
-                        <option value="">请选择</option>
-                        <option value="na" ${savedData.ethicsCheck === 'na' ? 'selected' : ''}>不适用</option>
-                        <option value="yes" ${savedData.ethicsCheck === 'yes' ? 'selected' : ''}>✅ 符合要求</option>
-                        <option value="no" ${savedData.ethicsCheck === 'no' ? 'selected' : ''}>❌ 不符合</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">实验前准备状态记录 <span class="required">*</span></label>
+                    <label class="form-label">准备状态记录 <span class="required">*</span></label>
                     <div class="upload-zone" onclick="document.getElementById('step1File').click()">
                         <div class="upload-icon">📷</div>
                         <div class="upload-text">点击拍照或选择文件</div>
@@ -2440,42 +2646,46 @@
         }
 
         function renderStep2(savedData) {
+            const sopGuide = getSOPGuideForStep(2);
             return `
-                <div class="form-group">
+                <div class="sop-guide" id="sopGuide2">
+                    <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide2')">
+                        <span>📖 操作手册关键步骤指导</span>
+                        <span class="sop-guide-toggle">▼</span>
+                    </div>
+                    <div class="sop-guide-body">
+                        ${sopGuide}
+                    </div>
+                </div>
+
+                <div class="form-group compact">
                     <label class="form-label">样本编号</label>
-                    <input type="text" class="form-control" id="sampleId" placeholder="输入样本唯一编号" value="${savedData.sampleId || ''}">
+                    <input type="text" class="form-control" id="sampleId" placeholder="样本唯一编号" value="${savedData.sampleId || ''}">
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">样本处理方式</label>
-                    <textarea class="form-control" id="sampleProcess" rows="2" placeholder="描述样本处理步骤...">${savedData.sampleProcess || ''}</textarea>
+                <div class="form-group compact">
+                    <label class="form-label">处理方式</label>
+                    <input type="text" class="form-control" id="sampleProcess" placeholder="简要描述处理方法" value="${savedData.sampleProcess || ''}">
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">试剂配制记录</label>
-                    <textarea class="form-control" id="reagentPrep" rows="3" placeholder="记录试剂配制方法、浓度、体积...">${savedData.reagentPrep || ''}</textarea>
-                </div>
-
-                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing);">
-                    <div class="form-group">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-sm);">
+                    <div class="form-group compact">
                         <label class="form-label">浓度</label>
                         <input type="text" class="form-control" id="concentration" placeholder="如: 10 mg/mL" value="${savedData.concentration || ''}">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group compact">
                         <label class="form-label">体积</label>
                         <input type="text" class="form-control" id="volume" placeholder="如: 200 μL" value="${savedData.volume || ''}">
                     </div>
+                    <div class="form-group compact">
+                        <label class="form-label">温度/时间</label>
+                        <input type="text" class="form-control" id="temperature" placeholder="37°C / 2h" value="${savedData.temperature || ''}">
+                    </div>
                 </div>
 
-                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing);">
-                    <div class="form-group">
-                        <label class="form-label">温度</label>
-                        <input type="text" class="form-control" id="temperature" placeholder="如: 37°C" value="${savedData.temperature || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">时间</label>
-                        <input type="text" class="form-control" id="duration" placeholder="如: 2小时" value="${savedData.duration || ''}">
-                    </div>
+                <div class="form-group compact">
+                    <label class="form-label">备注</label>
+                    <input type="text" class="form-control" id="reagentPrep" placeholder="试剂配制或其他备注" value="${savedData.reagentPrep || ''}">
                 </div>
             `;
         }
@@ -2545,16 +2755,26 @@
                 typeSpecificSteps = pcrSteps;
             }
 
+            const sopGuide = getSOPGuideForStep(3);
             return `
+                <div class="sop-guide" id="sopGuide3">
+                    <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide3')">
+                        <span>📖 操作手册关键步骤指导</span>
+                        <span class="sop-guide-toggle">▼</span>
+                    </div>
+                    <div class="sop-guide-body">
+                        ${sopGuide}
+                    </div>
+                </div>
+
                 <div class="alert alert-warning">
-                    <strong>⚠️ 关键记录点 2</strong><br>
-                    请拍照或录像记录核心实验操作过程
+                    <strong>⚠️ 关键记录点 2</strong> — 请拍照或录像记录核心操作过程
                 </div>
 
                 ${typeSpecificSteps}
 
                 <div class="form-group">
-                    <label class="form-label">核心操作过程记录 <span class="required">*</span></label>
+                    <label class="form-label">核心操作记录 <span class="required">*</span></label>
                     <div class="upload-zone" onclick="document.getElementById('step3File').click()">
                         <div class="upload-icon">📹</div>
                         <div class="upload-text">点击拍照或录像</div>
@@ -2568,74 +2788,78 @@
         }
 
         function renderStep4(savedData) {
+            const sopGuide = getSOPGuideForStep(4);
             return `
-                <div class="form-group">
-                    <label class="form-label">阳性对照</label>
-                    <select class="form-control" id="positiveControl">
-                        <option value="">请选择</option>
-                        <option value="yes" ${savedData.positiveControl === 'yes' ? 'selected' : ''}>✅ 已设置</option>
-                        <option value="no" ${savedData.positiveControl === 'no' ? 'selected' : ''}>❌ 未设置</option>
-                        <option value="na" ${savedData.positiveControl === 'na' ? 'selected' : ''}>不适用</option>
-                    </select>
+                <div class="sop-guide" id="sopGuide4">
+                    <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide4')">
+                        <span>📖 操作手册关键步骤指导</span>
+                        <span class="sop-guide-toggle">▼</span>
+                    </div>
+                    <div class="sop-guide-body">
+                        ${sopGuide}
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">阴性对照</label>
-                    <select class="form-control" id="negativeControl">
-                        <option value="">请选择</option>
-                        <option value="yes" ${savedData.negativeControl === 'yes' ? 'selected' : ''}>✅ 已设置</option>
-                        <option value="no" ${savedData.negativeControl === 'no' ? 'selected' : ''}>❌ 未设置</option>
-                        <option value="na" ${savedData.negativeControl === 'na' ? 'selected' : ''}>不适用</option>
-                    </select>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-sm);">
+                    <div class="form-group compact">
+                        <label class="form-label">阳性对照</label>
+                        <select class="form-control" id="positiveControl">
+                            <option value="na" ${savedData.positiveControl === 'na' ? 'selected' : ''}>N/A</option>
+                            <option value="yes" ${savedData.positiveControl === 'yes' ? 'selected' : ''}>✅ 已设</option>
+                            <option value="no" ${savedData.positiveControl === 'no' ? 'selected' : ''}>❌ 未设</option>
+                        </select>
+                    </div>
+                    <div class="form-group compact">
+                        <label class="form-label">阴性对照</label>
+                        <select class="form-control" id="negativeControl">
+                            <option value="na" ${savedData.negativeControl === 'na' ? 'selected' : ''}>N/A</option>
+                            <option value="yes" ${savedData.negativeControl === 'yes' ? 'selected' : ''}>✅ 已设</option>
+                            <option value="no" ${savedData.negativeControl === 'no' ? 'selected' : ''}>❌ 未设</option>
+                        </select>
+                    </div>
+                    <div class="form-group compact">
+                        <label class="form-label">重复</label>
+                        <input type="text" class="form-control" id="replicates" placeholder="如: n=3" value="${savedData.replicates || ''}">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">空白对照</label>
-                    <select class="form-control" id="blankControl">
-                        <option value="">请选择</option>
-                        <option value="yes" ${savedData.blankControl === 'yes' ? 'selected' : ''}>✅ 已设置</option>
-                        <option value="no" ${savedData.blankControl === 'no' ? 'selected' : ''}>❌ 未设置</option>
-                        <option value="na" ${savedData.blankControl === 'na' ? 'selected' : ''}>不适用</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">重复样本</label>
-                    <input type="text" class="form-control" id="replicates" placeholder="如: 3个生物学重复" value="${savedData.replicates || ''}">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">仪器参数</label>
-                    <textarea class="form-control" id="instrumentParams" rows="2" placeholder="记录关键仪器参数设置...">${savedData.instrumentParams || ''}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">是否偏离SOP</label>
+                <div class="form-group compact">
+                    <label class="form-label">SOP偏离</label>
                     <select class="form-control" id="deviationFromSOP">
                         <option value="no" ${savedData.deviationFromSOP === 'no' ? 'selected' : ''}>✅ 按SOP执行</option>
                         <option value="yes" ${savedData.deviationFromSOP === 'yes' ? 'selected' : ''}>⚠️ 有偏离</option>
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group compact">
                     <label class="form-label">异常说明</label>
-                    <textarea class="form-control" id="abnormalNote" rows="3" placeholder="如有异常，请详细说明...">${savedData.abnormalNote || ''}</textarea>
+                    <textarea class="form-control" id="abnormalNote" rows="2" placeholder="如有异常请说明(无异常可不填)">${savedData.abnormalNote || ''}</textarea>
                 </div>
             `;
         }
 
         function renderStep5(savedData) {
+            const sopGuide = getSOPGuideForStep(5);
             return `
+                <div class="sop-guide" id="sopGuide5">
+                    <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide5')">
+                        <span>📖 操作手册关键步骤指导</span>
+                        <span class="sop-guide-toggle">▼</span>
+                    </div>
+                    <div class="sop-guide-body">
+                        ${sopGuide}
+                    </div>
+                </div>
+
                 <div class="alert alert-warning">
-                    <strong>⚠️ 关键记录点 3</strong><br>
-                    请上传实验结果或原始数据
+                    <strong>⚠️ 关键记录点 3</strong> — 请上传实验结果或原始数据
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">原始数据上传 <span class="required">*</span></label>
+                    <label class="form-label">原始数据/结果图片 <span class="required">*</span></label>
                     <div class="upload-zone" onclick="document.getElementById('step5File').click()">
                         <div class="upload-icon">📁</div>
-                        <div class="upload-text">点击上传原始数据</div>
+                        <div class="upload-text">点击上传原始数据或结果图片</div>
                         <div class="upload-hint">支持图片、视频、数据文件</div>
                     </div>
                     <input type="file" id="step5File" class="file-input" accept="image/*,video/*,.csv,.xlsx,.txt,.pdf" 
@@ -2643,43 +2867,25 @@
                     <div id="step5Files"></div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">结果图片</label>
-                    <div class="upload-zone" onclick="document.getElementById('resultImageFile').click()">
-                        <div class="upload-icon">🖼️</div>
-                        <div class="upload-text">点击上传结果图片</div>
-                    </div>
-                    <input type="file" id="resultImageFile" class="file-input" accept="image/*" 
-                           onchange="handleFileUpload(this, 'result')" multiple>
-                    <div id="resultFiles"></div>
-                </div>
-
-                <div class="form-group">
+                <div class="form-group compact">
                     <label class="form-label">初步结论</label>
-                    <textarea class="form-control" id="conclusion" rows="3" placeholder="记录实验初步结论...">${savedData.conclusion || ''}</textarea>
+                    <textarea class="form-control" id="conclusion" rows="2" placeholder="简要记录实验结论...">${savedData.conclusion || ''}</textarea>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">是否达到预期</label>
-                    <select class="form-control" id="expectedResult">
-                        <option value="">请选择</option>
-                        <option value="yes" ${savedData.expectedResult === 'yes' ? 'selected' : ''}>✅ 达到预期</option>
-                        <option value="partial" ${savedData.expectedResult === 'partial' ? 'selected' : ''}>⚠️ 部分达到</option>
-                        <option value="no" ${savedData.expectedResult === 'no' ? 'selected' : ''}>❌ 未达到</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">是否需要复核</label>
-                    <select class="form-control" id="needReview">
-                        <option value="yes" ${savedData.needReview === 'yes' ? 'selected' : ''}>✅ 需要</option>
-                        <option value="no" ${savedData.needReview === 'no' ? 'selected' : ''}>❌ 不需要</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">下一步计划</label>
-                    <textarea class="form-control" id="nextPlan" rows="2" placeholder="记录下一步实验计划...">${savedData.nextPlan || ''}</textarea>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm);">
+                    <div class="form-group compact">
+                        <label class="form-label">是否达到预期</label>
+                        <select class="form-control" id="expectedResult">
+                            <option value="">请选择</option>
+                            <option value="yes" ${savedData.expectedResult === 'yes' ? 'selected' : ''}>✅ 达到</option>
+                            <option value="partial" ${savedData.expectedResult === 'partial' ? 'selected' : ''}>⚠️ 部分</option>
+                            <option value="no" ${savedData.expectedResult === 'no' ? 'selected' : ''}>❌ 未达到</option>
+                        </select>
+                    </div>
+                    <div class="form-group compact">
+                        <label class="form-label">下一步</label>
+                        <input type="text" class="form-control" id="nextPlan" placeholder="下一步计划(简记)" value="${savedData.nextPlan || ''}">
+                    </div>
                 </div>
             `;
         }
@@ -3256,6 +3462,49 @@
             DataStore.init();
             renderProjectList();
         });
+    
+        function toggleSOPGuide(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        function getSOPGuideForStep(stepNum) {
+            const expType = experimentData.type || '';
+            const guides = {
+                1: {
+                    default: '<ol><li>核对实验SOP，确认操作步骤</li><li>检查样本编号、数量和保存状态</li><li>记录关键试剂批号和有效期</li><li>确认仪器正常运行并记录参数</li><li>涉及人体/动物实验确认伦理审批</li></ol><div class="tip">💡 提示：实验前准备充分是实验成功的关键，建议逐项核对后再开始</div>',
+                    western: '<ol><li>准备RIPA裂解液(加蛋白酶/磷酸酶抑制剂，冰上)</li><li>检查电泳槽、转膜槽是否清洁</li><li>PVDF膜甲醇活化(10-30s)</li><li>配制新鲜封闭液(5%脱脂奶粉)</li><li>确认一抗、二抗在有效期内</li></ol><div class="tip">💡 WB关键：全程冰上操作蛋白提取；PVDF膜必须活化；内参选择GAPDH/β-actin</div>',
+                    qpcr: '<ol><li>检查引物是否验证过效率和特异性</li><li>解冻cDNA模板和Master Mix(冰上)</li><li>设计96孔板布局(含3复孔+NTC)</li><li>检查qPCR仪器是否正常</li><li>确认内参基因在该条件下稳定</li></ol><div class="tip">💡 qPCR关键：分区操作防污染；技术重复CV<5%；熔解曲线验证特异性</div>',
+                    cell: '<ol><li>显微镜检查细胞状态(形态、密度、污染)</li><li>确认培养基预热至37°C</li><li>准备胰酶(贴壁细胞)或离心管(悬浮细胞)</li><li>记录细胞代数和传代日期</li><li>确认CO2培养箱温度和气体</li></ol><div class="tip">💡 细胞实验关键：细胞汇合度60-80%时操作最佳；定期检测支原体</div>',
+                    animal: '<ol><li>确认IACUC伦理审批有效</li><li>检查动物健康状态(精神/活动/体重)</li><li>准备给药器械(灌胃针/注射器)</li><li>计算给药剂量(按体重)</li><li>准备麻醉和镇痛药物</li></ol><div class="tip">💡 动物实验关键：3R原则；随机分组；盲法评估；记录伦理终点</div>'
+                },
+                2: {
+                    default: '<ol><li>记录样本唯一编号</li><li>按SOP描述处理样本</li><li>记录试剂配制方法和浓度</li><li>控制反应温度和时间</li><li>标记处理后的样本</li></ol><div class="tip">💡 提示：样本处理是实验变异的主要来源，严格按SOP操作</div>',
+                    western: '<ol><li>RIPA冰上裂解30min(每10min涡旋)</li><li>14000g 4°C离心15min取上清</li><li>BCA法测定蛋白浓度</li><li>调整所有样品至同一浓度</li><li>加Loading Buffer 95°C变性5min</li></ol><div class="tip">💡 蛋白提取关键：全程冰上；裂解液含抑制剂；定量后统一浓度</div>',
+                    qpcr: '<ol><li>配制20μL反应体系(Master Mix 10μL)</li><li>每样品3个技术重复</li><li>光学封膜，离心去气泡</li><li>设置PCR程序(预变性+40循环+熔解曲线)</li><li>开始运行</li></ol><div class="tip">💡 qPCR加样关键：加样在冰上操作；避免气泡；封膜要压实</div>'
+                },
+                3: {
+                    default: '<ol><li>按SOP执行核心实验操作</li><li>记录关键参数(温度/时间/转速)</li><li>注意观察实验现象</li><li>如有异常立即记录</li><li>拍照/录像记录关键步骤</li></ol><div class="tip">💡 提示：核心操作是实验成败关键，建议有经验者在场指导</div>',
+                    western: '<ol><li>上样(20-40μg/孔)+蛋白Marker</li><li>电泳:80V浓缩胶→120V分离胶</li><li>转膜:300mA冰浴90min</li><li>封闭:5%脱脂奶粉1h</li><li>一抗4°C过夜→二抗1h→ECL显影</li></ol><div class="tip">💡 WB关键：转膜时冰浴降温；磷酸化蛋白用BSA封闭；ECL现配现用</div>',
+                    qpcr: '<ol><li>监控扩增曲线是否正常</li><li>检查熔解曲线是否单峰</li><li>记录Ct值</li><li>确认NTC无扩增</li><li>导出原始数据</li></ol><div class="tip">💡 qPCR关键：熔解曲线单峰=特异性好；NTC无扩增=无污染</div>',
+                    cell: '<ol><li>按实验方案处理细胞(加药/转染/刺激)</li><li>记录处理浓度和时间</li><li>显微镜观察细胞反应</li><li>拍照记录细胞状态</li><li>按方案收集细胞或继续培养</li></ol><div class="tip">💡 细胞处理关键：药物浓度需预实验确定；设溶剂对照</div>',
+                    animal: '<ol><li>按方案给药/造模</li><li>记录给药剂量、途径、时间</li><li>观察动物反应</li><li>记录异常情况</li><li>术后动物护理(镇痛/保温)</li></ol><div class="tip">💡 动物操作关键：固定好动物防误伤；灌胃注意角度防误吸</div>'
+                },
+                4: {
+                    default: '<ol><li>确认阳性对照结果正确</li><li>确认阴性对照无信号</li><li>检查重复间一致性(CV<15%)</li><li>记录仪器参数</li><li>判断是否偏离SOP</li></ol><div class="tip">💡 提示：质控是数据可信的保障，对照不合格需重做</div>'
+                },
+                5: {
+                    default: '<ol><li>保存原始数据(未处理)</li><li>拍照记录结果(全幅、未裁剪)</li><li>记录初步结论</li><li>判断是否达到预期</li><li>规划下一步实验</li></ol><div class="tip">💡 提示：原始数据是科研的基石，切勿只保存处理后的图片</div>'
+                }
+            };
+
+            const stepGuides = guides[stepNum] || guides[1];
+            if (stepGuides.western && (expType.includes('western') || expType.includes('wb'))) return stepGuides.western;
+            if (stepGuides.qpcr && (expType.includes('pcr') || expType.includes('qpcr'))) return stepGuides.qpcr;
+            if (stepGuides.cell && (expType.includes('cell') || expType.includes('cck') || expType.includes('edu') || expType.includes('apoptosis') || expType.includes('cycle') || expType.includes('transwell') || expType.includes('wound'))) return stepGuides.cell;
+            if (stepGuides.animal && (expType.includes('animal') || expType.includes('xenograft') || expType.includes('tumor'))) return stepGuides.animal;
+            return stepGuides.default;
+        }
+
     </script>
 </body>
 </html>
