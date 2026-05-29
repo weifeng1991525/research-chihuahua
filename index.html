@@ -1,0 +1,3261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>科研吉娃娃 Research Chihuahua</title>
+    <style>
+        /* ===== CSS Variables & Reset ===== */
+        :root {
+            --primary-blue: #1a5fb4;
+            --primary-blue-light: #3584e4;
+            --primary-blue-dark: #0d3a7a;
+            --white: #ffffff;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --success-light: #d4edda;
+            --warning: #ffc107;
+            --warning-light: #fff3cd;
+            --danger: #dc3545;
+            --danger-light: #f8d7da;
+            --info: #17a2b8;
+            --info-light: #d1ecf1;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 16px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e8eef5 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            line-height: 1.6;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* ===== Layout Components ===== */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            padding: var(--spacing);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Header ===== */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            color: var(--white);
+            padding: var(--spacing) var(--spacing-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .logo-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: var(--white);
+            padding: var(--spacing-sm) var(--spacing);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .back-btn.visible {
+            display: flex;
+        }
+
+        /* ===== Cards ===== */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--spacing);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card-header {
+            padding: var(--spacing);
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .card-body {
+            padding: var(--spacing);
+        }
+
+        /* ===== Project Cards ===== */
+        .project-card {
+            cursor: pointer;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .project-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            flex: 1;
+        }
+
+        .project-code {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            background: var(--gray-100);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            margin-left: var(--spacing-sm);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .meta-tag.primary {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .meta-tag.success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .meta-tag.warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .meta-tag.danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-sm);
+            margin: var(--spacing) 0;
+            padding: var(--spacing-sm) 0;
+            border-top: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+
+        .progress-section {
+            margin-top: var(--spacing-sm);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, var(--primary-blue-light) 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .risk-alert {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: var(--warning-light);
+            border-radius: var(--radius);
+            margin-top: var(--spacing-sm);
+            font-size: 0.8rem;
+            color: var(--gray-700);
+        }
+
+        .risk-alert.high {
+            background: var(--danger-light);
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--gray-800);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .btn-sm {
+            padding: var(--spacing-sm) var(--spacing);
+            font-size: 0.85rem;
+        }
+
+        /* ===== Forms ===== */
+        .form-group {
+            margin-bottom: var(--spacing);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .form-label .required {
+            color: var(--danger);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--spacing);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: var(--white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 95, 180, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .form-text {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* ===== Step Indicator ===== */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--gray-200);
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gray-200);
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .step-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            margin-top: var(--spacing-xs);
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        /* ===== File Upload ===== */
+        .upload-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--gray-50);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-blue);
+            background: rgba(26, 95, 180, 0.02);
+        }
+
+        .upload-zone.has-file {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .upload-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .upload-hint {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: var(--spacing-xs);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: var(--white);
+            border-radius: var(--radius);
+            margin-top: var(--spacing-sm);
+        }
+
+        .file-preview img, .file-preview video {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+        }
+
+        .file-info {
+            flex: 1;
+            font-size: 0.8rem;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .file-size {
+            color: var(--gray-500);
+        }
+
+        .file-remove {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        /* ===== Lists ===== */
+        .list-group {
+            list-style: none;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing);
+            border-bottom: 1px solid var(--gray-100);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item:hover {
+            background: var(--gray-50);
+        }
+
+        .list-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing);
+            font-size: 1.25rem;
+        }
+
+        .list-content {
+            flex: 1;
+        }
+
+        .list-title {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .list-subtitle {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .list-arrow {
+            color: var(--gray-400);
+        }
+
+        /* ===== Badges ===== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-info {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        /* ===== Empty State ===== */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--gray-500);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing);
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .empty-text {
+            font-size: 0.875rem;
+        }
+
+        /* ===== Modal ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: var(--spacing);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            max-width: 400px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            padding: var(--spacing) var(--spacing-lg);
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .modal-footer {
+            padding: var(--spacing) var(--spacing-lg);
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: flex-end;
+        }
+
+        /* ===== Alert ===== */
+        .alert {
+            padding: var(--spacing);
+            border-radius: var(--radius);
+            margin-bottom: var(--spacing);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+        }
+
+        .alert-warning {
+            background: var(--warning-light);
+            color: var(--gray-700);
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-danger {
+            background: var(--danger-light);
+            color: var(--gray-700);
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-info {
+            background: var(--info-light);
+            color: var(--gray-700);
+            border-left: 4px solid var(--info);
+        }
+
+        /* ===== Compliance Banner ===== */
+        .compliance-banner {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid var(--warning);
+            border-radius: var(--radius);
+            padding: var(--spacing);
+            margin-bottom: var(--spacing);
+            font-size: 0.8rem;
+        }
+
+        .compliance-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .compliance-text {
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* ===== SOP Categories ===== */
+        .sop-category {
+            margin-bottom: var(--spacing);
+        }
+
+        .sop-category-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: var(--spacing-sm);
+            padding-left: var(--spacing-xs);
+            border-left: 3px solid var(--primary-blue);
+        }
+
+        /* ===== Audit Log ===== */
+        .audit-item {
+            display: flex;
+            gap: var(--spacing);
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.85rem;
+        }
+
+        .audit-time {
+            color: var(--gray-500);
+            min-width: 80px;
+            font-size: 0.75rem;
+        }
+
+        .audit-content {
+            flex: 1;
+        }
+
+        .audit-action {
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .audit-detail {
+            color: var(--gray-500);
+            font-size: 0.8rem;
+        }
+
+        /* ===== Print Styles ===== */
+        @media print {
+            .app-header, .btn, .back-btn, .no-print {
+                display: none !important;
+            }
+
+            .page {
+                display: block !important;
+                padding: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid var(--gray-300);
+                break-inside: avoid;
+            }
+
+            body {
+                background: white;
+            }
+        }
+
+        /* ===== Utility Classes ===== */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mt-1 { margin-top: var(--spacing-sm); }
+        .mt-2 { margin-top: var(--spacing); }
+        .mb-1 { margin-bottom: var(--spacing-sm); }
+        .mb-2 { margin-bottom: var(--spacing); }
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: var(--spacing-sm); }
+        .gap-2 { gap: var(--spacing); }
+
+        /* ===== Section Divider ===== */
+        .section-divider {
+            height: 8px;
+            background: var(--gray-100);
+            margin: var(--spacing-lg) calc(-1 * var(--spacing));
+        }
+
+        /* ===== Timeline ===== */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: var(--spacing);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            border: 2px solid var(--white);
+            box-shadow: 0 0 0 2px var(--primary-blue);
+        }
+
+        .timeline-item.completed::before {
+            background: var(--success);
+            box-shadow: 0 0 0 2px var(--success);
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .timeline-time {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        /* ===== Review Actions ===== */
+        .review-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .review-actions .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <span class="logo-icon">🐕</span>
+                    <div>
+                        <div class="logo-text">科研吉娃娃</div>
+                        <div class="logo-subtitle">Research Chihuahua</div>
+                    </div>
+                </div>
+                <button class="back-btn" id="backBtn" onclick="goBack()">
+                    ← 返回
+                </button>
+            </div>
+        </header>
+
+        <!-- Page 1: Project List -->
+        <div class="page active" id="page-project-list">
+            <div class="compliance-banner">
+                <div class="compliance-title">
+                    ⚠️ 合规提醒
+                </div>
+                <div class="compliance-text">
+                    请勿上传可识别患者身份的信息。临床样本和患者数据必须脱敏。动物和人体相关研究需符合伦理审批要求。
+                </div>
+            </div>
+
+            <div id="projectList">
+                <!-- Projects will be rendered here -->
+            </div>
+
+            <div class="card" style="margin-top: var(--spacing-lg);">
+                <div class="card-body text-center">
+                    <button class="btn btn-outline" onclick="exportAllData()">
+                        📥 导出所有数据
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 2: Project Detail -->
+        <div class="page" id="page-project-detail">
+            <div id="projectOverview">
+                <!-- Project overview will be rendered here -->
+            </div>
+
+            <div class="btn-group mb-2">
+                <button class="btn btn-primary" onclick="startExperiment()">
+                    🧪 开始实验
+                </button>
+                <button class="btn btn-outline" onclick="showSOPList()">
+                    📚 我要学习
+                </button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Experiment Records -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📋 实验记录</span>
+                    <span class="badge badge-info" id="expCountBadge">0 条</span>
+                </div>
+                <div class="card-body" id="experimentList">
+                    <!-- Experiment list will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Audit Log -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📝 审计日志</span>
+                    <button class="btn btn-sm btn-outline" onclick="viewFullAuditLog()">查看全部</button>
+                </div>
+                <div class="card-body" id="auditLogPreview">
+                    <!-- Recent audit logs will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Export -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">💾 数据管理</span>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group">
+                        <button class="btn btn-outline" onclick="exportProjectData()">
+                            📥 导出JSON
+                        </button>
+                        <button class="btn btn-outline" onclick="printProjectRecords()">
+                            🖨️ 打印记录
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 3: SOP List -->
+        <div class="page" id="page-sop-list">
+            <div id="sopCategories">
+                <!-- SOP categories will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Page 4: SOP Detail -->
+        <div class="page" id="page-sop-detail">
+            <div id="sopDetail">
+                <!-- SOP detail will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Page 5: Experiment Form -->
+        <div class="page" id="page-experiment-form">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" id="expFormTitle">开始新实验</span>
+                </div>
+                <div class="card-body">
+                    <!-- Basic Info -->
+                    <div class="form-group">
+                        <label class="form-label">实验编号</label>
+                        <input type="text" class="form-control" id="expId" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">实验次数</label>
+                        <input type="text" class="form-control" id="expNumber" readonly>
+                    </div>
+
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing);">
+                        <div class="form-group">
+                            <label class="form-label">日期</label>
+                            <input type="date" class="form-control" id="expDate" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">时间</label>
+                            <input type="time" class="form-control" id="expTime" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">操作者 <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="expOperator" placeholder="请输入操作者姓名">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">实验地点 <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="expLocation" placeholder="正在获取位置...">
+                        <div class="form-text" id="locationStatus">尝试获取GPS定位...</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">实验类型 <span class="required">*</span></label>
+                        <select class="form-control" id="expType" onchange="onExpTypeChange()">
+                            <option value="">请选择实验类型</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden" id="customTypeGroup">
+                        <label class="form-label">自定义实验类型</label>
+                        <input type="text" class="form-control" id="customExpType" placeholder="请输入自定义实验类型">
+                    </div>
+
+                    <button class="btn btn-primary btn-block" onclick="startExperimentSteps()">
+                        下一步：填写实验步骤
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 6: Experiment Steps -->
+        <div class="page" id="page-experiment-steps">
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">准备</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">处理</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">操作</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">质控</div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">结果</div>
+                </div>
+            </div>
+
+            <div class="card" id="stepCard">
+                <div class="card-header">
+                    <span class="card-title" id="stepTitle">步骤 1: 实验前准备</span>
+                </div>
+                <div class="card-body" id="stepContent">
+                    <!-- Step content will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="btn-group" id="stepNav">
+                <button class="btn btn-outline" id="prevStepBtn" onclick="prevStep()" disabled>
+                    上一步
+                </button>
+                <button class="btn btn-outline" onclick="showStepDetail()">
+                    详细说明
+                </button>
+                <button class="btn btn-primary" id="nextStepBtn" onclick="nextStep()">
+                    下一步
+                </button>
+            </div>
+        </div>
+
+        <!-- Page 7: Experiment Detail -->
+        <div class="page" id="page-experiment-detail">
+            <div id="experimentDetail">
+                <!-- Experiment detail will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Page 8: Audit Log Full -->
+        <div class="page" id="page-audit-log">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📝 完整审计日志</span>
+                </div>
+                <div class="card-body" id="fullAuditLog">
+                    <!-- Full audit log will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 9: Print View -->
+        <div class="page" id="page-print-view">
+            <div id="printContent">
+                <!-- Print content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Step Detail -->
+    <div class="modal-overlay" id="stepDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">详细说明</div>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be rendered here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Missing Records Warning -->
+    <div class="modal-overlay" id="missingRecordModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">⚠️ 关键记录点缺失</div>
+            </div>
+            <div class="modal-body">
+                <p>以下关键记录点尚未完成：</p>
+                <ul id="missingRecordsList" style="margin: var(--spacing) 0; padding-left: var(--spacing-lg);"></ul>
+                <div class="form-group">
+                    <label class="form-label">缺失原因说明</label>
+                    <textarea class="form-control" id="missingReason" placeholder="请说明缺失原因..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeMissingModal()">返回补充</button>
+                <button class="btn btn-warning" onclick="submitWithMissingReason()">继续提交</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== Data Store =====
+        const DataStore = {
+            // Initialize with sample data
+            init() {
+                if (!localStorage.getItem('rc_projects')) {
+                    const sampleProjects = [
+                        {
+                            id: 'PRJ-2024-001',
+                            name: '乳腺癌HER2靶向治疗耐药机制研究',
+                            purpose: '探究HER2阳性乳腺癌患者对曲妥珠单抗耐药的分子机制，寻找新的治疗靶点',
+                            hypothesis: 'PI3K/AKT信号通路异常激活是HER2靶向治疗耐药的关键机制',
+                            pi: '张教授',
+                            ethicsId: 'IRB-2024-0156',
+                            stage: '动物实验阶段',
+                            progress: 65,
+                            totalExperiments: 24,
+                            lastExpDate: '2024-01-15',
+                            riskLevel: 'medium',
+                            riskNote: '动物实验进行中，需注意动物伦理和生物安全',
+                            createdAt: '2024-01-01T00:00:00Z'
+                        },
+                        {
+                            id: 'PRJ-2024-002',
+                            name: '非小细胞肺癌免疫治疗疗效预测标志物筛选',
+                            purpose: '基于多组学数据筛选预测PD-1/PD-L1抑制剂疗效的生物标志物',
+                            hypothesis: '肿瘤微环境中CD8+ T细胞浸润水平与免疫治疗疗效正相关',
+                            pi: '李主任',
+                            ethicsId: 'IRB-2024-0234',
+                            stage: '临床样本收集',
+                            progress: 35,
+                            totalExperiments: 12,
+                            lastExpDate: '2024-01-12',
+                            riskLevel: 'high',
+                            riskNote: '涉及人体样本，必须严格脱敏处理',
+                            createdAt: '2024-01-05T00:00:00Z'
+                        },
+                        {
+                            id: 'PRJ-2024-003',
+                            name: '糖尿病肾病足细胞损伤机制及干预研究',
+                            purpose: '研究高糖环境下足细胞损伤的分子机制，评估潜在保护药物',
+                            hypothesis: 'AMPK信号通路激活可减轻高糖诱导的足细胞凋亡',
+                            pi: '王研究员',
+                            ethicsId: 'IRB-2024-0312',
+                            stage: '细胞实验阶段',
+                            progress: 80,
+                            totalExperiments: 45,
+                            lastExpDate: '2024-01-18',
+                            riskLevel: 'low',
+                            riskNote: '细胞实验进展顺利，即将进入动物实验',
+                            createdAt: '2023-12-15T00:00:00Z'
+                        }
+                    ];
+                    localStorage.setItem('rc_projects', JSON.stringify(sampleProjects));
+                }
+                if (!localStorage.getItem('rc_experiments')) {
+                    localStorage.setItem('rc_experiments', JSON.stringify([]));
+                }
+                if (!localStorage.getItem('rc_audit_logs')) {
+                    localStorage.setItem('rc_audit_logs', JSON.stringify([]));
+                }
+            },
+
+            getProjects() {
+                return JSON.parse(localStorage.getItem('rc_projects') || '[]');
+            },
+
+            getProject(id) {
+                return this.getProjects().find(p => p.id === id);
+            },
+
+            saveProject(project) {
+                const projects = this.getProjects();
+                const index = projects.findIndex(p => p.id === project.id);
+                if (index >= 0) {
+                    projects[index] = project;
+                } else {
+                    projects.push(project);
+                }
+                localStorage.setItem('rc_projects', JSON.stringify(projects));
+            },
+
+            getExperiments(projectId) {
+                const exps = JSON.parse(localStorage.getItem('rc_experiments') || '[]');
+                return exps.filter(e => e.projectId === projectId).sort((a, b) => 
+                    new Date(b.startTime) - new Date(a.startTime)
+                );
+            },
+
+            getExperiment(id) {
+                const exps = JSON.parse(localStorage.getItem('rc_experiments') || '[]');
+                return exps.find(e => e.id === id);
+            },
+
+            saveExperiment(experiment) {
+                const exps = JSON.parse(localStorage.getItem('rc_experiments') || '[]');
+                const index = exps.findIndex(e => e.id === experiment.id);
+                if (index >= 0) {
+                    exps[index] = experiment;
+                } else {
+                    exps.push(experiment);
+                }
+                localStorage.setItem('rc_experiments', JSON.stringify(exps));
+            },
+
+            addAuditLog(log) {
+                const logs = JSON.parse(localStorage.getItem('rc_audit_logs') || '[]');
+                logs.unshift({
+                    id: 'LOG-' + Date.now(),
+                    timestamp: new Date().toISOString(),
+                    ...log
+                });
+                // Keep only last 1000 logs
+                if (logs.length > 1000) logs.pop();
+                localStorage.setItem('rc_audit_logs', JSON.stringify(logs));
+            },
+
+            getAuditLogs(projectId, limit = 50) {
+                const logs = JSON.parse(localStorage.getItem('rc_audit_logs') || '[]');
+                const filtered = projectId ? logs.filter(l => l.projectId === projectId) : logs;
+                return filtered.slice(0, limit);
+            },
+
+            exportAll() {
+                return {
+                    projects: this.getProjects(),
+                    experiments: JSON.parse(localStorage.getItem('rc_experiments') || '[]'),
+                    auditLogs: JSON.parse(localStorage.getItem('rc_audit_logs') || '[]'),
+                    exportTime: new Date().toISOString()
+                };
+            }
+        };
+
+        // ===== SOP Data =====
+        const SOPData = {
+    categories: [
+        {
+            id: 'cell', name: '细胞实验', icon: '🧫',
+            sops: [
+                { id: 'cell-001', name: '细胞复苏', desc: '冻存细胞解冻与培养恢复' },
+                { id: 'cell-002', name: '细胞传代', desc: '贴壁/悬浮细胞传代培养' },
+                { id: 'cell-003', name: '细胞冻存', desc: '细胞冻存与长期保存' },
+                { id: 'cell-004', name: '细胞计数', desc: '台盼蓝/自动细胞计数' },
+                { id: 'cell-005', name: 'CCK-8细胞活力检测', desc: '细胞增殖与毒性检测' },
+                { id: 'cell-006', name: 'EdU细胞增殖检测', desc: 'DNA合成掺入检测' },
+                { id: 'cell-007', name: '划痕实验/伤口愈合', desc: '细胞迁移能力检测' },
+                { id: 'cell-008', name: 'Transwell迁移/侵袭', desc: '细胞迁移与侵袭检测' },
+                { id: 'cell-009', name: '流式细胞术', desc: '细胞表型与分群分析' },
+                { id: 'cell-010', name: '细胞凋亡检测', desc: 'Annexin V/PI双染法' },
+                { id: 'cell-011', name: '细胞周期检测', desc: 'PI染色流式分析' },
+                { id: 'cell-012', name: '细胞克隆形成', desc: '单细胞增殖克隆能力' },
+                { id: 'cell-013', name: '细胞衰老检测', desc: 'SA-β-Gal染色法' },
+                { id: 'cell-014', name: '细胞免疫荧光', desc: '蛋白亚细胞定位' },
+                { id: 'cell-015', name: '活死细胞染色', desc: 'Calcein-AM/EthD-1双染' }
+            ]
+        },
+        {
+            id: 'molecular', name: '分子实验', icon: '🧬',
+            sops: [
+                { id: 'mol-001', name: 'RNA提取(TRIzol法)', desc: '总RNA提取与纯化' },
+                { id: 'mol-002', name: 'DNA提取', desc: '基因组DNA提取' },
+                { id: 'mol-003', name: '质粒DNA提取', desc: '碱裂解法小量提取' },
+                { id: 'mol-004', name: '蛋白提取(RIPA法)', desc: '总蛋白裂解提取' },
+                { id: 'mol-005', name: '蛋白浓度测定(BCA法)', desc: 'BCA法蛋白定量' },
+                { id: 'mol-006', name: 'qPCR(实时荧光定量PCR)', desc: '基因表达精确定量' },
+                { id: 'mol-007', name: 'RT-PCR(逆转录PCR)', desc: 'RNA逆转录与PCR扩增' },
+                { id: 'mol-008', name: 'Western Blot', desc: '蛋白质免疫印迹检测' },
+                { id: 'mol-009', name: 'ELISA', desc: '酶联免疫吸附测定' },
+                { id: 'mol-010', name: '免疫荧光(IF)', desc: '荧光标记蛋白检测' },
+                { id: 'mol-011', name: '免疫组化(IHC-DAB)', desc: 'DAB显色组织蛋白检测' },
+                { id: 'mol-012', name: 'HE染色', desc: '苏木精-伊红组织染色' },
+                { id: 'mol-013', name: 'Masson三色染色', desc: '胶原纤维组织染色' },
+                { id: 'mol-014', name: '免疫共沉淀(Co-IP)', desc: '蛋白-蛋白互作检测' },
+                { id: 'mol-015', name: '染色质免疫共沉淀(ChIP)', desc: '蛋白-DNA结合检测' },
+                { id: 'mol-016', name: '凝胶迁移实验(EMSA)', desc: '蛋白-DNA结合活性' },
+                { id: 'mol-017', name: 'RNA免疫沉淀(RIP)', desc: '蛋白-RNA互作检测' },
+                { id: 'mol-018', name: '双荧光素酶报告基因', desc: '转录调控活性检测' },
+                { id: 'mol-019', name: '质粒转染', desc: '外源基因瞬时表达' },
+                { id: 'mol-020', name: 'siRNA转染', desc: 'RNAi基因沉默' },
+                { id: 'mol-021', name: '慢病毒感染', desc: '基因稳定表达/敲低' },
+                { id: 'mol-022', name: 'CRISPR-Cas9基因编辑', desc: '靶向基因编辑' },
+                { id: 'mol-023', name: 'RNA FISH', desc: 'RNA空间分布检测' },
+                { id: 'mol-024', name: 'TUNEL法检测凋亡', desc: 'DNA断裂末端标记' },
+                { id: 'mol-025', name: 'PCR扩增', desc: 'DNA体外扩增' },
+                { id: 'mol-026', name: '琼脂糖凝胶电泳', desc: '核酸片段大小分离' },
+                { id: 'mol-027', name: 'Northern Blot', desc: 'RNA表达检测' },
+                { id: 'mol-028', name: '原位杂交(ISH)', desc: '核酸组织原位检测' },
+                { id: 'mol-029', name: 'GST Pull-down', desc: '蛋白互作体外验证' }
+            ]
+        },
+        {
+            id: 'pathology', name: '病理实验', icon: '🔬',
+            sops: [
+                { id: 'path-001', name: '石蜡切片制备', desc: '组织固定脱水包埋切片' },
+                { id: 'path-002', name: '冰冻切片制备', desc: 'OCT包埋冰冻切片' },
+                { id: 'path-003', name: '免疫组化(IHC-DAB)', desc: 'DAB显色蛋白检测' },
+                { id: 'path-004', name: '免疫荧光组织(IHF)', desc: '荧光标记组织蛋白' },
+                { id: 'path-005', name: 'TUNEL染色(组织)', desc: '组织凋亡细胞检测' },
+                { id: 'path-006', name: 'PAS染色(糖原)', desc: '糖原/糖蛋白检测' },
+                { id: 'path-007', name: '油红O染色(脂质)', desc: '中性脂质检测' },
+                { id: 'path-008', name: '免疫电镜', desc: '亚细胞蛋白定位' },
+                { id: 'path-009', name: 'TTC染色(脑梗死)', desc: '脑梗死面积评估' },
+                { id: 'path-010', name: '刚果红染色(淀粉样变)', desc: '淀粉样物质检测' }
+            ]
+        },
+        {
+            id: 'animal', name: '动物实验', icon: '🐭',
+            sops: [
+                { id: 'ani-001', name: '动物分组与标记', desc: '随机分组与编号标记' },
+                { id: 'ani-002', name: '动物给药(灌胃)', desc: '经口灌胃给药' },
+                { id: 'ani-003', name: '动物给药(腹腔注射)', desc: '腹腔注射给药' },
+                { id: 'ani-004', name: '动物给药(静脉注射)', desc: '尾静脉注射给药' },
+                { id: 'ani-005', name: '动物给药(皮下注射)', desc: '皮下注射给药' },
+                { id: 'ani-006', name: '肿瘤皮下移植瘤模型', desc: '皮下成瘤与药效评价' },
+                { id: 'ani-007', name: '原位肿瘤模型', desc: '原位成瘤模拟微环境' },
+                { id: 'ani-008', name: '动物取材/组织采集', desc: '组织样本采集与处理' },
+                { id: 'ani-009', name: '肿瘤体积测量', desc: '卡尺测量与生长曲线' },
+                { id: 'ani-010', name: '小动物活体成像', desc: '生物发光/荧光成像' },
+                { id: 'ani-011', name: '小鼠尾静脉采血', desc: '微量采血' },
+                { id: 'ani-012', name: '小鼠眼球摘除采血', desc: '终末大量采血' },
+                { id: 'ani-013', name: '心脏灌流固定', desc: '组织原位灌注固定' },
+                { id: 'ani-014', name: '动物行为学实验', desc: '学习记忆/运动/焦虑评估' },
+                { id: 'ani-015', name: '动物生存曲线', desc: 'Kaplan-Meier生存分析' }
+            ]
+        },
+        {
+            id: 'clinical', name: '临床样本', icon: '🏥',
+            sops: [
+                { id: 'cli-001', name: '临床样本收集', desc: '知情同意与样本采集' },
+                { id: 'cli-002', name: '外周血分离(PBMC)', desc: 'Ficoll密度梯度离心' },
+                { id: 'cli-003', name: '血清/血浆分离', desc: '离心分离血清或血浆' },
+                { id: 'cli-004', name: '组织样本处理与保存', desc: '固定/冻存/OCT包埋' },
+                { id: 'cli-005', name: '尿液样本处理', desc: '尿液离心与保存' },
+                { id: 'cli-006', name: '病历数据录入与脱敏', desc: '去标识化数据管理' },
+                { id: 'cli-007', name: '随访数据录入', desc: '生存/复发/不良反应记录' }
+            ]
+        },
+        {
+            id: 'omics', name: '组学实验', icon: '📊',
+            sops: [
+                { id: 'om-001', name: 'RNA-seq文库构建', desc: 'mRNA富集与cDNA建库' },
+                { id: 'om-002', name: '转录组测序(RNA-seq)', desc: '全转录组表达谱' },
+                { id: 'om-003', name: 'ChIP-seq', desc: '蛋白结合基因组位点' },
+                { id: 'om-004', name: 'ATAC-seq', desc: '开放染色质区域' },
+                { id: 'om-005', name: '蛋白组学(LC-MS/MS)', desc: '蛋白质组鉴定与定量' },
+                { id: 'om-006', name: '代谢组学', desc: '小分子代谢物谱' },
+                { id: 'om-007', name: '单细胞RNA测序', desc: '单细胞转录组' },
+                { id: 'om-008', name: '空间转录组', desc: '空间基因表达' },
+                { id: 'om-009', name: '全外显子组测序(WES)', desc: '外显子区变异检测' },
+                { id: 'om-010', name: '全基因组测序(WGS)', desc: '全基因组变异检测' },
+                { id: 'om-011', name: '甲基化测序', desc: 'CpG甲基化水平' },
+                { id: 'om-012', name: 'RIP-seq', desc: '蛋白结合RNA谱' },
+                { id: 'om-013', name: '蛋白质谱鉴定', desc: '胶内/溶液内酶解质谱' }
+            ]
+        },
+        {
+            id: 'analysis', name: '数据分析', icon: '💻',
+            sops: [
+                { id: 'an-001', name: 'GraphPad Prism统计分析', desc: 't检验/ANOVA/生存分析' },
+                { id: 'an-002', name: 'R语言统计分析', desc: '高级统计与可视化' },
+                { id: 'an-003', name: 'ImageJ图像分析', desc: 'WB灰度/荧光/细胞计数' },
+                { id: 'an-004', name: '生物信息学分析(转录组)', desc: 'RNA-seq数据分析流程' },
+                { id: 'an-005', name: '生存分析', desc: 'Kaplan-Meier/Cox回归' },
+                { id: 'an-006', name: '论文图表制作', desc: '出版级SCI图表' },
+                { id: 'an-007', name: 'Meta分析', desc: '系统评价与荟萃分析' },
+                { id: 'an-008', name: '倾向性评分匹配(PSM)', desc: '混杂因素平衡' }
+            ]
+        }
+    ],
+
+    getSOPDetail(sopId) {
+        const details = {
+            'cell-001': {
+                purpose: '将液氮冻存的细胞在37°C快速解冻，离心去除DMSO后重悬培养，恢复细胞增殖能力。冻存细胞在-196°C超低温下代谢完全停止，快速解冻可避免冰晶损伤细胞膜。',
+                scope: '适用于液氮冻存的哺乳动物细胞系、原代细胞、干细胞等所有冻存细胞',
+                materials: '①完全培养基(预热至37°C) ②PBS(预热) ③0.25%胰酶(备用) ④冻存管(液氮中取出) ⑤15mL离心管 ⑥T25/T75培养瓶',
+                equipment: '①37°C水浴锅 ②CO2培养箱(37°C,5%CO2) ③超净工作台/生物安全柜 ④离心机 ⑤倒置显微镜',
+                steps: ['1.准备:预热培养基和PBS至37°C；超净台紫外消毒30min','2.取出冻存管:从液氮罐中快速取出，立即放入37°C水浴','3.解冻:轻轻晃动冻存管，1-2min内使冰完全融化','4.转移:75%酒精喷洒消毒，转移至超净台','5.稀释:细胞悬液缓慢加入含5mL预温培养基的15mL离心管','6.离心:300g离心5min，弃上清(去除DMSO)','7.重悬:加5mL预温完全培养基，轻轻吹打混匀','8.接种:转入T25培养瓶，补充培养基至5-6mL','9.培养:37°C,5%CO2培养箱培养','10.观察:4-6h后显微镜观察贴壁情况并换液','11.次日评估:24h后检查细胞形态和贴壁率'],
+                qc: '细胞存活率>80%(台盼蓝计数)；24h内贴壁率>70%；无微生物污染(培养基清澈)；细胞形态正常',
+                faq: 'Q1:复苏后细胞存活率低？A:检查冻存液配方(10%DMSO+90%FBS)；确认冻存时细胞状态(对数期)；解冻速度是否够快。Q2:复苏后细胞不贴壁？A:培养基不合适；培养瓶不干净；更换血清批号。Q3:大量死细胞？A:离心转速过高/时间过长；DMSO未完全去除。',
+                dataSave: '冻存管编号和位置记录、复苏日期时间、培养基批号、细胞形态照片(4h/24h)、存活率检测数据',
+                photoReq: '①解冻前冻存管照片 ②4h后细胞形态(100×) ③24h后细胞形态(100×) ④异常情况额外拍照'
+            },
+            'cell-005': {
+                purpose: 'CCK-8试剂中的WST-8在线粒体脱氢酶作用下被还原为橙色甲瓒(formazan)，其吸光度(OD450)与活细胞数量成正比，用于评估细胞增殖和药物毒性。',
+                scope: '适用于贴壁细胞和悬浮细胞的增殖检测、细胞毒性检测、药物IC50测定和高通量药物筛选',
+                materials: '①CCK-8试剂(Dojindo) ②完全培养基 ③待测药物(不同浓度) ④DMSO(溶解药物) ⑤PBS ⑥96孔板',
+                equipment: '①CO2培养箱 ②酶标仪(450nm) ③多通道移液器 ④倒置显微镜 ⑤超净工作台',
+                steps: ['1.细胞接种:按1000-10000细胞/孔接种96孔板(100μL/孔)','2.培养过夜:37°C,5%CO2培养24h使细胞贴壁','3.药物处理:加不同浓度药物(3-6复孔)，设空白和阴性对照','4.孵育:37°C培养24-72h(依实验目的)','5.加CCK-8:每孔加10μL CCK-8试剂(1/10体积)','6.继续孵育:37°C孵育1-4h(需预实验确定最佳时间)','7.检测:酶标仪450nm测定吸光度','8.数据处理:扣除空白OD值，计算细胞活力百分比','9.绘制曲线:药物浓度-细胞活力剂量效应曲线','10.计算IC50:GraphPad Prism拟合曲线'],
+                qc: '复孔间CV<15%；标准曲线R²>0.99；空白孔OD<0.1；阳性对照抑制率>50%',
+                faq: 'Q1:OD值过高超出检测范围？A:减少细胞接种量或缩短CCK-8孵育时间。Q2:复孔变异大(CV>15%)？A:细胞接种不均匀；移液器校准；边缘效应。Q3:DMSO影响？A:终浓度≤0.1%，设DMSO对照。',
+                dataSave: '原始OD450数据、药物浓度梯度、细胞接种密度、孵育时间、酶标仪参数、GraphPad分析文件',
+                photoReq: '①96孔板布局图 ②加药前细胞状态(40×) ③CCK-8显色后96孔板 ④酶标仪原始数据截图'
+            },
+            'cell-010': {
+                purpose: 'Annexin V与磷脂酰丝氨酸(PS)高亲和力结合检测早期凋亡，PI染色死细胞DNA检测晚期凋亡和坏死。双染可区分活细胞、早期凋亡、晚期凋亡/坏死和机械损伤细胞。',
+                scope: '适用于检测化疗药物、辐射、靶向药物等诱导的细胞凋亡；区分凋亡与坏死；流式细胞术检测',
+                materials: '①Annexin V-FITC/PI双染试剂盒 ②Binding Buffer ③PBS(无Ca²⁺Mg²⁺) ④凋亡诱导剂(阳性对照) ⑤无血清培养基',
+                equipment: '①流式细胞仪 ②离心机 ③CO2培养箱 ④荧光显微镜(可选)',
+                steps: ['1.细胞培养:接种6孔板(2×10⁵-5×10⁵/孔)，培养过夜','2.凋亡诱导:加凋亡诱导剂处理适当时间','3.收集细胞:收集上清+胰酶消化(不加EDTA)合并','4.离心:300g离心5min，弃上清','5.洗涤:PBS洗涤1次','6.重悬:100μL Binding Buffer重悬','7.加染料:5μL Annexin V-FITC + 5μL PI，轻轻混匀','8.避光孵育:室温避光15min','9.补加Buffer:加400μL Binding Buffer','10.上机检测:1h内流式检测(488nm激发)','11.数据分析:四象限散点图分析'],
+                qc: '阴性对照早期凋亡<5%；阳性对照早期凋亡>30%；FSC/SSC设门排除碎片；单染对照补偿正确',
+                faq: 'Q1:早期凋亡率低？A:优化诱导剂浓度和时间；检查Annexin V-FITC是否过期。Q2:PI阳性率异常高？A:可能是坏死而非凋亡；检查药物浓度。Q3:四象限无法区分？A:调节电压补偿；设单染对照。',
+                dataSave: '流式原始数据(.fcs)、四象限散点图、各象限百分比、实验条件(药物/浓度/时间)',
+                photoReq: '①细胞处理前状态 ②流式散点图(含门和象限标记) ③阳性对照结果 ④补偿设置截图'
+            },
+            'mol-001': {
+                purpose: 'TRIzol(异硫氰酸胍-苯酚混合物)裂解细胞/组织，氯仿分层后RNA分配在水相，异丙醇沉淀获得总RNA。适用于下游qPCR、RNA-seq、Northern Blot等实验。',
+                scope: '适用于细胞、组织(含富含RNA的肝脏、脾脏等)的总RNA提取',
+                materials: '①TRIzol试剂 ②氯仿 ③异丙醇 ④75%乙醇(DEPC水配制) ⑤DEPC水 ⑥RNase-free离心管和枪头',
+                equipment: '①超净工作台 ②离心机(4°C) ③Nanodrop/分光光度计 ④涡旋混合器 ⑤冰盒',
+                steps: ['1.样品裂解:加TRIzol(1mL/5×10⁶细胞或50mg组织)，室温5min','2.匀浆:组织用匀浆器充分匀浆','3.氯仿分层:加0.2mL氯仿/mL TRIzol，剧烈晃动15s，室温3min','4.离心:12000g 4°C离心15min','5.取水相:上层水相(无色，含RNA)转移至新管','6.沉淀:加0.5mL异丙醇，上下颠倒混匀，室温10min','7.离心:12000g 4°C离心10min，弃上清','8.洗涤:加1mL 75%乙醇洗涤','9.离心:7500g 4°C离心5min，弃上清','10.干燥:室温晾干5-10min(不要过度干燥)','11.溶解:加20-50μL DEPC水溶解RNA','12.定量:Nanodrop检测浓度和纯度'],
+                qc: 'A260/280=1.8-2.0；A260/230>2.0；28S/18S≈2:1(电泳)；RIN>7.0(生物分析仪)',
+                faq: 'Q1:RNA降解？A:操作不够RNase-free；样品未及时处理；组织自溶。Q2:A260/280<1.8？A:蛋白质污染，重新酚氯仿抽提。Q3:得率低？A:组织量不足；异丙醇沉淀不完全；溶解不充分。',
+                dataSave: 'RNA浓度和纯度数据、电泳图、Nanodrop原始数据、保存位置记录',
+                photoReq: '①TRIzol分层后照片(水相/有机相/界面) ②电泳图(28S/18S条带) ③Nanodrop检测截图'
+            },
+            'mol-006': {
+                purpose: '实时荧光定量PCR通过监测每个循环的荧光信号，Ct值与初始模板量成反比。用2^-ΔΔCt法计算基因相对表达量，精确定量基因表达差异。',
+                scope: '适用于基因表达定量分析、miRNA检测、基因拷贝数变异、病原体检测等',
+                materials: '①cDNA模板 ②qPCR Master Mix(SYBR Green/TaqMan) ③正反向引物(10μM) ④Nuclease-free Water ⑤96孔/qPCR板及光学封膜',
+                equipment: '①实时荧光定量PCR仪 ②微量离心机 ③涡旋混合器 ④冰盒',
+                steps: ['1.引物设计:目标基因和内参引物，Tm 58-62°C，产物80-200bp','2.引物验证:琼脂糖凝胶电泳单条带；效率90-110%','3.cDNA准备:逆转录cDNA稀释5-10倍','4.反应体系(20μL):Master Mix 10μL + 引物各0.4μL + cDNA 2μL + Water 7.2μL','5.加样:每样品3技术重复，加入96孔板','6.封膜:光学封膜，离心去除气泡','7.PCR程序:95°C 30s → (95°C 5s → 60°C 30s)×40 → 熔解曲线','8.数据分析:导出Ct值，2^-ΔΔCt计算相对表达','9.统计学:GraphPad Prism进行t检验或ANOVA'],
+                qc: '熔解曲线单峰；扩增效率90-110%；R²>0.99；技术重复CV<5%；NTC无扩增；内参稳定',
+                faq: 'Q1:熔解曲线多峰？A:引物二聚体或非特异扩增；重新设计引物。Q2:扩增曲线不典型？A:模板浓度过高/过低；引物效率不佳。Q3:重复间Ct差异>0.5？A:加样误差；气泡；板孔蒸发。',
+                dataSave: 'qPCR原始数据文件、Ct值表、熔解曲线图、扩增曲线图、引物序列和效率、统计分析结果',
+                photoReq: '①96孔板布局图 ②扩增曲线截图 ③熔解曲线截图 ④琼脂糖凝胶电泳图(引物验证)'
+            },
+            'mol-008': {
+                purpose: 'SDS-PAGE按分子量分离蛋白，转膜至PVDF膜后，抗体特异性识别靶蛋白，化学发光检测蛋白表达水平。内参蛋白用于归一化定量。',
+                scope: '适用于检测细胞或组织中特定蛋白表达水平、蛋白分子量验证、蛋白修饰(磷酸化/乙酰化等)',
+                materials: '①RIPA裂解液(含抑制剂) ②BCA试剂盒 ③SDS-PAGE凝胶 ④电泳/转膜缓冲液 ⑤PVDF膜 ⑥5%脱脂奶粉/BSA ⑦一抗 ⑧HRP二抗 ⑨ECL底物 ⑩TBST',
+                equipment: '①电泳仪及垂直电泳槽 ②转膜系统 ③摇床 ④化学发光成像系统 ⑤离心机 ⑥金属浴',
+                steps: ['1.蛋白提取:RIPA冰上裂解30min，14000g离心15min取上清','2.蛋白定量:BCA法测定浓度，调整所有样品至同一浓度','3.样品变性:蛋白+5×Loading Buffer，95°C 5min','4.灌胶:分离胶(8-15%)+浓缩胶(5%)','5.上样:每孔20-40μg蛋白+Marker','6.电泳:80V浓缩胶→120V分离胶','7.转膜:PVDF膜甲醇活化，300mA冰浴90min','8.封闭:5%脱脂奶粉室温1h','9.一抗:4°C摇床过夜','10.洗涤:TBST 3×10min','11.二抗:HRP二抗室温1h','12.洗涤:TBST 3×10min','13.显影:ECL底物，化学发光成像系统曝光','14.分析:ImageJ灰度值，靶蛋白/内参归一化'],
+                qc: '内参条带均匀清晰；目的条带位置正确；背景干净无杂带；重复实验CV<20%',
+                faq: 'Q1:无目的条带？A:蛋白表达太低；增加上样量；延长曝光；检查抗体。Q2:背景太高？A:增加洗涤；降低抗体浓度；更换封闭液。Q3:条带位置不对？A:蛋白修饰导致迁移率改变；确认分子量。',
+                dataSave: '原始化学发光图像(.tif)、蛋白浓度数据、抗体信息(名称/稀释比/批号)、ImageJ灰度分析数据',
+                photoReq: '①蛋白样品电泳后凝胶照片 ②转膜后丽春红S染色照片 ③化学发光原始图像(多曝光) ④ImageJ分析截图'
+            },
+            'mol-011': {
+                purpose: '利用抗原-抗体特异性结合，HRP标记二抗催化DAB产生棕褐色沉淀，定位组织切片中靶蛋白表达位置和强度。苏木素复染细胞核(蓝色)形成对比。',
+                scope: '适用于石蜡包埋组织切片中蛋白表达检测、肿瘤标志物评估、病理诊断辅助',
+                materials: '①石蜡切片 ②二甲苯 ③梯度乙醇 ④抗原修复液(柠檬酸钠pH6.0) ⑤3%H₂O₂ ⑥5%BSA ⑦一抗 ⑧HRP二抗 ⑨DAB试剂盒 ⑩苏木素 ⑪中性树胶',
+                equipment: '①烤箱(60°C) ②微波炉/高压锅 ③湿盒 ④光学显微镜 ⑤盖玻片',
+                steps: ['1.烤片:60°C 1-2h(防脱片)','2.脱蜡:二甲苯I/II各15min','3.水化:100%→95%→80%→70%乙醇各5min→蒸馏水','4.抗原修复:微波柠檬酸钠沸腾后中火15min，冷却30min','5.PBS洗涤:3×5min','6.淬灭内源酶:3%H₂O₂室温15min','7.PBS洗涤:3×5min','8.封闭:5%BSA室温1h','9.一抗:湿盒4°C过夜','10.PBS洗涤:3×5min','11.二抗:HRP二抗室温1h','12.PBS洗涤:3×5min','13.DAB显色:显微镜监控(30s-5min)，流水终止','14.苏木素复染:2-5min','15.分化返蓝:盐酸乙醇分化→氨水返蓝','16.脱水封片:梯度乙醇→二甲苯→中性树胶','17.阅片:显微镜评估染色'],
+                qc: '阳性对照正确染色；阴性对照无信号；染色定位正确(膜/浆/核)；背景干净；可重复',
+                faq: 'Q1:背景太深？A:内源酶淬灭不充分；二抗浓度过高；洗涤不充分。Q2:无阳性信号？A:抗原修复不当；一抗浓度太低。Q3:染色不均匀？A:切片厚薄不均；抗体未铺满。',
+                dataSave: '切片信息、抗体信息(克隆号/稀释比/批号)、染色条件、评分结果(双人盲评H-score)',
+                photoReq: '①DAB显色过程监控截图 ②最终染色照片(40×/100×/200×) ③阳性对照 ④阴性对照 ⑤评分记录表'
+            },
+            'ani-006': {
+                purpose: '将对数生长期肿瘤细胞接种于免疫缺陷小鼠皮下，利用体内微环境支持肿瘤生长。定期测量肿瘤体积，评价药物干预效果。常用于抗肿瘤药物体内筛选。',
+                scope: '适用于人源肿瘤细胞系皮下成瘤、抗肿瘤药物体内疗效评价',
+                materials: '①肿瘤细胞系(对数期) ②Matrigel(4°C) ③PBS ④0.25%胰酶 ⑤完全培养基 ⑥75%酒精',
+                equipment: '①CO2培养箱 ②超净台 ③离心机 ④细胞计数仪 ⑤游标卡尺 ⑥电子天平',
+                steps: ['1.细胞准备:培养至对数期(80-90%汇合)，确认无污染','2.细胞收集:胰酶消化，离心，PBS洗涤','3.细胞计数:活力>95%，调整浓度','4.细胞重悬:PBS:Matrigel=1:1，5×10⁶/100μL','5.冰上保存:防Matrigel凝固','6.动物准备:4-6周龄免疫缺陷小鼠','7.消毒:75%酒精消毒右侧腋下','8.皮下注射:提起皮褶，45°角注入100μL','9.成瘤监测:每周2-3次触摸检查','10.肿瘤测量:卡尺测L和W，V=L×W²×0.5','11.分组给药:肿瘤约100mm³时随机分组','12.疗效评估:绘制生长曲线，计算抑瘤率'],
+                qc: '成瘤率>80%；各组起始体积均衡(差异<20%)；伦理终点监控(≤1500mm³)',
+                faq: 'Q1:不成瘤？A:细胞活力低；细胞数不足；Matrigel比例不对；小鼠品系不对。Q2:成瘤不均一？A:细胞悬液不均匀；注射深度不一致。Q3:肿瘤溃破？A:已达伦理终点未处理。',
+                dataSave: '细胞批号和代数、接种细胞数、小鼠品系周龄、分组方案、肿瘤体积原始数据、体重变化',
+                photoReq: '①细胞培养状态 ②接种操作 ③肿瘤生长过程(每周) ④卡尺测量 ⑤剥离后肿瘤 ⑥生长曲线图'
+            },
+            'om-007': {
+                purpose: '利用10x Genomics微流控技术将单个细胞与带barcode的凝胶珠包裹在油滴中，裂解后mRNA被逆转录并标记细胞来源barcode和UMI。建库测序后根据barcode获得每个细胞的基因表达谱。',
+                scope: '适用于肿瘤异质性研究、免疫细胞分群、发育轨迹分析、稀有细胞鉴定',
+                materials: '①单细胞悬液(活力>85%) ②10x Genomics Chromium试剂盒 ③cDNA扩增试剂 ④文库构建试剂 ⑤Qubit dsDNA HS Assay ⑥Bioanalyzer芯片',
+                equipment: '①10x Chromium Controller ②PCR热循环仪 ③磁力架 ④Qubit ⑤Bioanalyzer ⑥离心机(4°C)',
+                steps: ['1.组织解离:酶消化/机械解离获得单细胞悬液','2.细胞质控:计数+活力检测(>85%)，过滤40μm','3.浓度调整:700-1200 cells/μL','4.上样:细胞悬液+Master Mix+Oil加入Chromium Chip','5.捕获:Chromium Controller运行，生成GEMs','6.裂解逆转录:GEMs中裂解细胞，逆转录cDNA','7.破乳回收:破乳回收cDNA','8.cDNA扩增:PCR扩增','9.cDNA质检:Qubit+Bioanalyzer','10.文库构建:片段化→末端修复→接头连接→索引PCR','11.文库质检:Qubit+Bioanalyzer','12.测序:Illumina 150bp PE，50K reads/cell','13.数据分析:Cell Ranger → Seurat分析'],
+                qc: '细胞活力>85%；中位基因数/细胞>1000；双细胞率<5%；线粒体基因<10%；Q30>85%',
+                faq: 'Q1:活力低？A:优化解离方案；死细胞去除试剂盒；减少操作时间。Q2:捕获细胞少？A:浓度不准确；GEM效率低。Q3:数据质量差？A:RNA降解；文库质量差。',
+                dataSave: '细胞质控数据、Chromium参数、cDNA和文库质检报告、测序数据(FASTQ)、分析代码和结果',
+                photoReq: '①单细胞悬液显微镜照片 ②Chromium运行照片 ③Bioanalyzer图谱 ④t-SNE/UMAP图 ⑤差异基因热图'
+            },
+            'an-003': {
+                purpose: 'ImageJ/Fiji是开源图像分析软件，通过图像预处理→阈值分割→区域测量，可定量分析WB灰度、荧光强度、细胞数量等参数。',
+                scope: '适用于Western Blot灰度定量、免疫荧光强度分析、细胞计数、迁移面积测量、组织切片定量等',
+                materials: '①ImageJ/Fiji软件(免费) ②实验图片(TIF格式，≥300dpi) ③Macro脚本(可选)',
+                equipment: '①计算机(Windows/Mac/Linux) ②显示器(校色)',
+                steps: ['1.安装:下载Fiji，解压即可使用','2.打开图片:File → Open','3.校准比例尺:Analyze → Set Scale，输入已知距离','4.背景扣除:Process → Subtract Background','5.灰度化:Image → Type → 8-bit','6.选择工具:矩形/自由选区框选目标','7.测量:Analyze → Measure(快捷键M)','8.多通道:Image → Color → Split Channels','9.WB灰度:矩形框选条带→Measure→记录IntDen','10.批量处理:Plugins → Macro → Record','11.数据导出:Results → Save As CSV','12.统计分析:导出数据用GraphPad/R分析'],
+                qc: '同一批次图片处理参数一致；测量结果可重复(CV<10%)；有比例尺校准记录',
+                faq: 'Q1:测量值不稳定？A:背景未扣除；框选不一致；图片压缩。Q2:无法打开？A:格式不支持(转TIF)。Q3:Macro报错？A:路径含中文；版本不兼容。',
+                dataSave: 'ImageJ测量数据(CSV)、处理参数记录、Macro脚本、统计分析结果',
+                photoReq: '①原始图片(处理前) ②处理后图片(标注测量区域) ③Measure窗口截图 ④CSV数据截图'
+            }
+        };
+        return details[sopId] || {
+            purpose: '标准实验操作流程，请参照实验室SOP执行',
+            scope: '适用于本实验室相关实验',
+            materials: '根据具体实验准备相应试剂耗材，详见实验方案',
+            equipment: '根据具体实验准备相应仪器设备，详见实验方案',
+            steps: ['1.实验前准备:核对SOP、准备试剂和仪器','2.样本处理:按实验方案处理样本','3.核心操作:按SOP步骤执行核心实验操作','4.质量控制:设置对照、记录参数、检查结果','5.结果记录:保存原始数据、拍照记录、初步分析'],
+            qc: '按照实验方案和SOP执行质量控制，设阳性/阴性对照',
+            faq: '如有问题请咨询实验室负责人或查阅相关文献和产品说明书',
+            dataSave: '保存所有原始数据和实验记录，包括图片、数据文件、实验条件等',
+            photoReq: '关键步骤拍照记录，原始数据完整保存，图片分辨率≥300dpi'
+        };
+    }
+};;
+
+        // ===== Experiment Types =====
+        const ExperimentTypes = [
+    // ======== 细胞实验 ========
+    { value: 'cell_thaw', label: '细胞复苏' },
+    { value: 'cell_passage', label: '细胞传代' },
+    { value: 'cell_freeze', label: '细胞冻存' },
+    { value: 'cell_count', label: '细胞计数' },
+    { value: 'cck8', label: 'CCK-8细胞活力检测' },
+    { value: 'edu', label: 'EdU细胞增殖检测' },
+    { value: 'wound_healing', label: '划痕实验/伤口愈合' },
+    { value: 'transwell', label: 'Transwell迁移/侵袭' },
+    { value: 'flow_cytometry', label: '流式细胞术' },
+    { value: 'apoptosis', label: '细胞凋亡检测(Annexin V/PI)' },
+    { value: 'cell_cycle', label: '细胞周期检测' },
+    { value: 'colony_formation', label: '细胞克隆形成' },
+    { value: 'cell_senescence', label: '细胞衰老检测(SA-β-Gal)' },
+    { value: 'cell_if', label: '细胞免疫荧光' },
+    { value: 'live_dead', label: '活死细胞染色' },
+    // ======== 分子实验 ========
+    { value: 'rna_extract', label: 'RNA提取(TRIzol法)' },
+    { value: 'dna_extract', label: 'DNA提取' },
+    { value: 'plasmid_extract', label: '质粒DNA提取' },
+    { value: 'protein_extract', label: '蛋白提取(RIPA法)' },
+    { value: 'bca', label: '蛋白浓度测定(BCA法)' },
+    { value: 'qpcr', label: 'qPCR(实时荧光定量PCR)' },
+    { value: 'rtpcr', label: 'RT-PCR(逆转录PCR)' },
+    { value: 'western_blot', label: 'Western Blot' },
+    { value: 'elisa', label: 'ELISA(酶联免疫吸附测定)' },
+    { value: 'immunofluorescence', label: '免疫荧光(IF)' },
+    { value: 'ihc', label: '免疫组化(IHC-DAB)' },
+    { value: 'he_stain', label: 'HE染色' },
+    { value: 'masson', label: 'Masson三色染色' },
+    { value: 'co_ip', label: '免疫共沉淀(Co-IP)' },
+    { value: 'chip', label: '染色质免疫共沉淀(ChIP)' },
+    { value: 'emsa', label: '凝胶迁移实验(EMSA)' },
+    { value: 'rip', label: 'RNA免疫沉淀(RIP)' },
+    { value: 'dual_luciferase', label: '双荧光素酶报告基因' },
+    { value: 'plasmid_transfection', label: '质粒转染' },
+    { value: 'sirna_transfection', label: 'siRNA转染' },
+    { value: 'lentivirus', label: '慢病毒感染' },
+    { value: 'crispr', label: 'CRISPR-Cas9基因编辑' },
+    { value: 'rna_fish', label: 'RNA FISH(荧光原位杂交)' },
+    { value: 'tunel', label: 'TUNEL法检测凋亡' },
+    { value: 'pcr', label: 'PCR扩增' },
+    { value: 'gel_electrophoresis', label: '琼脂糖凝胶电泳' },
+    { value: 'northern_blot', label: 'Northern Blot' },
+    { value: 'ish', label: '原位杂交(ISH)' },
+    { value: 'gst_pull_down', label: 'GST Pull-down' },
+    // ======== 动物实验 ========
+    { value: 'animal_group', label: '动物分组与标记' },
+    { value: 'animal_ig', label: '动物给药(灌胃i.g.)' },
+    { value: 'animal_ip', label: '动物给药(腹腔注射i.p.)' },
+    { value: 'animal_iv', label: '动物给药(静脉注射i.v.)' },
+    { value: 'animal_sc', label: '动物给药(皮下注射s.c.)' },
+    { value: 'xenograft', label: '肿瘤皮下移植瘤模型' },
+    { value: 'orthotopic', label: '原位肿瘤模型' },
+    { value: 'animal_harvest', label: '动物取材/组织采集' },
+    { value: 'tumor_measure', label: '肿瘤体积测量' },
+    { value: 'ivis', label: '小动物活体成像(IVIS)' },
+    { value: 'tail_vein_blood', label: '小鼠尾静脉采血' },
+    { value: 'retro_orbital', label: '小鼠眼球摘除采血' },
+    { value: 'cardiac_perfusion', label: '心脏灌流固定' },
+    { value: 'animal_behavior', label: '动物行为学实验' },
+    { value: 'animal_survival', label: '动物生存曲线/Kaplan-Meier' },
+    // ======== 病理实验 ========
+    { value: 'paraffin_section', label: '石蜡切片制备' },
+    { value: 'frozen_section', label: '冰冻切片制备' },
+    { value: 'ihc_dab', label: '免疫组化(IHC-DAB)' },
+    { value: 'ihf', label: '免疫荧光组织(IHF)' },
+    { value: 'tunel_tissue', label: 'TUNEL染色(组织)' },
+    { value: 'pas_stain', label: 'PAS染色(糖原)' },
+    { value: 'oil_red_o', label: '油红O染色(脂质)' },
+    { value: 'immuno_em', label: '免疫电镜' },
+    { value: 'ttc_stain', label: 'TTC染色(脑梗死)' },
+    { value: 'congo_red', label: '刚果红染色(淀粉样变)' },
+    // ======== 临床样本 ========
+    { value: 'clinical_collect', label: '临床样本收集' },
+    { value: 'pbmc_isolation', label: '外周血分离(PBMC/Ficoll)' },
+    { value: 'serum_plasma', label: '血清/血浆分离' },
+    { value: 'tissue_processing', label: '组织样本处理与保存' },
+    { value: 'urine_processing', label: '尿液样本处理' },
+    { value: 'data_deidentification', label: '病历数据录入与脱敏' },
+    { value: 'follow_up', label: '随访数据录入' },
+    // ======== 组学实验 ========
+    { value: 'library_prep', label: 'RNA-seq文库构建' },
+    { value: 'rna_seq', label: '转录组测序(RNA-seq)' },
+    { value: 'chip_seq', label: 'ChIP-seq' },
+    { value: 'atac_seq', label: 'ATAC-seq' },
+    { value: 'proteomics', label: '蛋白组学(LC-MS/MS)' },
+    { value: 'metabolomics', label: '代谢组学(LC-MS/GC-MS)' },
+    { value: 'sc_rna_seq', label: '单细胞RNA测序' },
+    { value: 'spatial_transcriptomics', label: '空间转录组' },
+    { value: 'wes', label: '全外显子组测序(WES)' },
+    { value: 'wgs', label: '全基因组测序(WGS)' },
+    { value: 'methylation_seq', label: '甲基化测序' },
+    { value: 'rip_seq', label: 'RIP-seq' },
+    { value: 'protein_ms', label: '蛋白质谱鉴定' },
+    // ======== 数据分析 ========
+    { value: 'graphpad_stats', label: 'GraphPad Prism统计分析' },
+    { value: 'r_stats', label: 'R语言统计分析' },
+    { value: 'imagej', label: 'ImageJ图像分析' },
+    { value: 'rna_seq_analysis', label: '生物信息学分析(转录组)' },
+    { value: 'survival_analysis', label: '生存分析(Kaplan-Meier/Cox)' },
+    { value: 'figure_prep', label: '论文图表制作' },
+    { value: 'meta_analysis', label: 'Meta分析' },
+    { value: 'psm', label: '倾向性评分匹配(PSM)' },
+    // ======== 其他 ========
+    { value: 'other', label: '其他（自定义）' }
+];
+
+        // ===== State Management =====
+        let currentProject = null;
+        let currentExperiment = null;
+        let currentStep = 1;
+        let experimentData = {};
+        let navigationStack = [];
+
+        // ===== Navigation =====
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function navigateTo(pageId) {
+            const currentPage = document.querySelector('.page.active');
+            if (currentPage) {
+                const currentId = currentPage.id.replace('page-', '');
+                navigationStack.push(currentId);
+            }
+            showPage(pageId);
+            updateBackButton();
+        }
+
+        function goBack() {
+            if (navigationStack.length > 0) {
+                const prevPage = navigationStack.pop();
+                showPage(prevPage);
+            } else {
+                showPage('project-list');
+            }
+            updateBackButton();
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('backBtn');
+            const currentPage = document.querySelector('.page.active');
+            if (currentPage && currentPage.id !== 'page-project-list') {
+                backBtn.classList.add('visible');
+            } else {
+                backBtn.classList.remove('visible');
+            }
+        }
+
+        // ===== Page 1: Project List =====
+        function renderProjectList() {
+            const projects = DataStore.getProjects();
+            const container = document.getElementById('projectList');
+
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-title">暂无项目</div>
+                        <div class="empty-text">点击右上角添加新项目</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = projects.map(project => `
+                <div class="card project-card" onclick="openProject('${project.id}')">
+                    <div class="card-body">
+                        <div class="project-header">
+                            <div class="project-name">${project.name}</div>
+                            <span class="project-code">${project.id}</span>
+                        </div>
+                        <div class="project-meta">
+                            <span class="meta-tag primary">👤 ${project.pi}</span>
+                            <span class="meta-tag success">📍 ${project.stage}</span>
+                            ${getRiskBadge(project.riskLevel)}
+                        </div>
+                        <div class="project-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${project.totalExperiments}</div>
+                                <div class="stat-label">累计实验</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${project.progress}%</div>
+                                <div class="stat-label">项目进度</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${formatDate(project.lastExpDate)}</div>
+                                <div class="stat-label">最近实验</div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span>项目进度</span>
+                                <span>${project.progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${project.progress}%"></div>
+                            </div>
+                        </div>
+                        ${project.riskNote ? `
+                            <div class="risk-alert ${project.riskLevel === 'high' ? 'high' : ''}">
+                                <span>⚠️</span>
+                                <span>${project.riskNote}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getRiskBadge(level) {
+            const badges = {
+                low: '<span class="meta-tag success">🟢 低风险</span>',
+                medium: '<span class="meta-tag warning">🟡 中风险</span>',
+                high: '<span class="meta-tag danger">🔴 高风险</span>'
+            };
+            return badges[level] || '';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        function openProject(projectId) {
+            currentProject = DataStore.getProject(projectId);
+            if (!currentProject) return;
+
+            renderProjectOverview();
+            renderExperimentList();
+            renderAuditLogPreview();
+            navigateTo('project-detail');
+
+            DataStore.addAuditLog({
+                projectId: projectId,
+                action: '查看项目',
+                detail: `进入项目 ${projectId}`,
+                operator: '当前用户'
+            });
+        }
+
+        // ===== Page 2: Project Detail =====
+        function renderProjectOverview() {
+            const container = document.getElementById('projectOverview');
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <div class="project-header">
+                            <div class="project-name">${currentProject.name}</div>
+                            <span class="project-code">${currentProject.id}</span>
+                        </div>
+                        <div class="project-meta mb-2">
+                            <span class="meta-tag primary">👤 ${currentProject.pi}</span>
+                            <span class="meta-tag info">📋 ${currentProject.ethicsId}</span>
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: var(--spacing);">
+                            <p><strong>研究目的：</strong>${currentProject.purpose}</p>
+                            <p style="margin-top: var(--spacing-sm);"><strong>研究假设：</strong>${currentProject.hypothesis}</p>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span>当前阶段：${currentProject.stage}</span>
+                                <span>${currentProject.progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${currentProject.progress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderExperimentList() {
+            const experiments = DataStore.getExperiments(currentProject.id);
+            document.getElementById('expCountBadge').textContent = `${experiments.length} 条`;
+            const container = document.getElementById('experimentList');
+
+            if (experiments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: var(--spacing-lg);">
+                        <div class="empty-icon">🧪</div>
+                        <div class="empty-title">暂无实验记录</div>
+                        <div class="empty-text">点击"开始实验"创建第一条记录</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="timeline">
+                    ${experiments.map((exp, index) => `
+                        <div class="timeline-item ${exp.reviewStatus === 'approved' ? 'completed' : ''}" 
+                             onclick="viewExperimentDetail('${exp.id}')">
+                            <div class="timeline-title">
+                                第${exp.expNumber}次实验 - ${getExpTypeLabel(exp.type)}
+                                ${getReviewBadge(exp.reviewStatus)}
+                            </div>
+                            <div class="timeline-time">
+                                ${formatDateTime(exp.startTime)} @ ${exp.location}
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500); margin-top: 2px;">
+                                操作者: ${exp.operator} | 
+                                完整性: ${getCompletenessIcon(exp.completeness)}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getExpTypeLabel(type) {
+            const found = ExperimentTypes.find(t => t.value === type);
+            return found ? found.label : type;
+        }
+
+        function getReviewBadge(status) {
+            const badges = {
+                pending: '<span class="badge badge-warning" style="margin-left: 8px;">待复核</span>',
+                approved: '<span class="badge badge-success" style="margin-left: 8px;">已通过</span>',
+                rejected: '<span class="badge badge-danger" style="margin-left: 8px;">退回</span>',
+                need_data: '<span class="badge badge-info" style="margin-left: 8px;">需补充</span>',
+                abnormal: '<span class="badge badge-danger" style="margin-left: 8px;">异常</span>'
+            };
+            return badges[status] || '';
+        }
+
+        function getCompletenessIcon(completeness) {
+            if (!completeness) return '⚠️ 未评估';
+            const { step1, step2, step3 } = completeness;
+            const complete = [step1, step2, step3].filter(Boolean).length;
+            const icons = ['⚠️', '⚠️', '⚠️', '✅'];
+            return `${icons[complete]} ${complete}/3`;
+        }
+
+        function formatDateTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return `${date.getMonth() + 1}月${date.getDate()}日 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function renderAuditLogPreview() {
+            const logs = DataStore.getAuditLogs(currentProject.id, 5);
+            const container = document.getElementById('auditLogPreview');
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="empty-text text-center">暂无审计记录</div>';
+                return;
+            }
+
+            container.innerHTML = logs.map(log => `
+                <div class="audit-item">
+                    <div class="audit-time">${formatDateTime(log.timestamp)}</div>
+                    <div class="audit-content">
+                        <div class="audit-action">${log.action}</div>
+                        <div class="audit-detail">${log.detail}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewFullAuditLog() {
+            const logs = DataStore.getAuditLogs(currentProject.id, 100);
+            const container = document.getElementById('fullAuditLog');
+
+            container.innerHTML = logs.map(log => `
+                <div class="audit-item">
+                    <div class="audit-time">${formatDateTime(log.timestamp)}</div>
+                    <div class="audit-content">
+                        <div class="audit-action">${log.action}</div>
+                        <div class="audit-detail">${log.detail} | 操作人: ${log.operator}</div>
+                    </div>
+                </div>
+            `).join('') || '<div class="empty-text text-center">暂无审计记录</div>';
+
+            navigateTo('audit-log');
+        }
+
+        function exportProjectData() {
+            const data = {
+                project: currentProject,
+                experiments: DataStore.getExperiments(currentProject.id),
+                auditLogs: DataStore.getAuditLogs(currentProject.id, 1000),
+                exportTime: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentProject.id}_export_${formatDateFile(new Date())}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            DataStore.addAuditLog({
+                projectId: currentProject.id,
+                action: '数据导出',
+                detail: '导出项目数据为JSON格式',
+                operator: '当前用户'
+            });
+
+            alert('数据导出成功！');
+        }
+
+        function formatDateFile(date) {
+            return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function printProjectRecords() {
+            const experiments = DataStore.getExperiments(currentProject.id);
+            const container = document.getElementById('printContent');
+
+            container.innerHTML = `
+                <div style="padding: 40px; max-width: 800px; margin: 0 auto;">
+                    <h1 style="text-align: center; color: var(--primary-blue); margin-bottom: 8px;">
+                        科研吉娃娃 - 实验记录报告
+                    </h1>
+                    <h2 style="text-align: center; font-weight: normal; margin-bottom: 32px;">
+                        ${currentProject.name}
+                    </h2>
+                    
+                    <div style="margin-bottom: 32px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                        <p><strong>项目编号：</strong>${currentProject.id}</p>
+                        <p><strong>项目负责人：</strong>${currentProject.pi}</p>
+                        <p><strong>伦理审批号：</strong>${currentProject.ethicsId}</p>
+                        <p><strong>当前阶段：</strong>${currentProject.stage}</p>
+                        <p><strong>项目进度：</strong>${currentProject.progress}%</p>
+                        <p><strong>累计实验次数：</strong>${currentProject.totalExperiments}</p>
+                    </div>
+
+                    <h3 style="border-bottom: 2px solid var(--primary-blue); padding-bottom: 8px; margin-bottom: 16px;">
+                        实验记录列表
+                    </h3>
+                    
+                    ${experiments.map((exp, i) => `
+                        <div style="margin-bottom: 24px; padding: 16px; border: 1px solid #dee2e6; border-radius: 8px; page-break-inside: avoid;">
+                            <h4 style="margin-bottom: 12px; color: var(--primary-blue);">
+                                实验 #${exp.expNumber} - ${getExpTypeLabel(exp.type)}
+                            </h4>
+                            <table style="width: 100%; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 4px 0; width: 120px;"><strong>实验编号：</strong></td>
+                                    <td>${exp.id}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 0;"><strong>开始时间：</strong></td>
+                                    <td>${formatDateTime(exp.startTime)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 0;"><strong>结束时间：</strong></td>
+                                    <td>${exp.endTime ? formatDateTime(exp.endTime) : '未完成'}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 0;"><strong>操作者：</strong></td>
+                                    <td>${exp.operator}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 0;"><strong>实验地点：</strong></td>
+                                    <td>${exp.location}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 0;"><strong>复核状态：</strong></td>
+                                    <td>${exp.reviewStatus || '待复核'}</td>
+                                </tr>
+                            </table>
+                            
+                            ${exp.stepData ? `
+                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef;">
+                                    <p><strong>初步结论：</strong>${exp.stepData.step5?.conclusion || '无'}</p>
+                                    ${exp.stepData.step4?.abnormalNote ? `
+                                        <p style="color: #dc3545;"><strong>异常记录：</strong>${exp.stepData.step4.abnormalNote}</p>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+
+                    <div style="margin-top: 48px; text-align: center; font-size: 12px; color: #6c757d;">
+                        <p>生成时间：${new Date().toLocaleString('zh-CN')}</p>
+                        <p>科研吉娃娃 Research Chihuahua</p>
+                    </div>
+                </div>
+            `;
+
+            navigateTo('print-view');
+            setTimeout(() => window.print(), 500);
+        }
+
+        // ===== Page 3: SOP List =====
+        function showSOPList() {
+            const container = document.getElementById('sopCategories');
+
+            container.innerHTML = SOPData.categories.map(cat => `
+                <div class="sop-category">
+                    <div class="sop-category-title">${cat.icon} ${cat.name}</div>
+                    <div class="card">
+                        <ul class="list-group">
+                            ${cat.sops.map(sop => `
+                                <li class="list-item" onclick="showSOPDetail('${sop.id}', '${sop.name}')">
+                                    <div class="list-icon" style="background: var(--info-light);">📄</div>
+                                    <div class="list-content">
+                                        <div class="list-title">${sop.name}</div>
+                                        <div class="list-subtitle">${sop.desc}</div>
+                                    </div>
+                                    <span class="list-arrow">›</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+
+            navigateTo('sop-list');
+        }
+
+        // ===== Page 4: SOP Detail =====
+        function showSOPDetail(sopId, sopName) {
+            const detail = SOPData.getSOPDetail(sopId);
+            const container = document.getElementById('sopDetail');
+
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">📄 ${sopName}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">实验目的</label>
+                            <p style="font-size: 0.9rem; color: var(--gray-700);">${detail.purpose}</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">适用范围</label>
+                            <p style="font-size: 0.9rem; color: var(--gray-700);">${detail.scope}</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">材料试剂</label>
+                            <p style="font-size: 0.9rem; color: var(--gray-700);">${detail.materials}</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">仪器设备</label>
+                            <p style="font-size: 0.9rem; color: var(--gray-700);">${detail.equipment}</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">操作步骤</label>
+                            <ol style="padding-left: var(--spacing-lg); font-size: 0.9rem; color: var(--gray-700);">
+                                ${detail.steps.map(step => `<li style="margin-bottom: 8px;">${step}</li>`).join('')}
+                            </ol>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">关键质控点</label>
+                            <div class="alert alert-info" style="margin: 0;">
+                                ${detail.qc}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">常见问题</label>
+                            <p style="font-size: 0.9rem; color: var(--gray-700);">${detail.faq}</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">原始数据保存要求</label>
+                            <p style="font-size: 0.9rem; color: var(--gray-700);">${detail.dataSave}</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">拍照/视频记录要求</label>
+                            <p style="font-size: 0.9rem; color: var(--gray-700);">${detail.photoReq}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            navigateTo('sop-detail');
+
+            DataStore.addAuditLog({
+                projectId: currentProject.id,
+                action: '查看SOP',
+                detail: `查看SOP: ${sopName}`,
+                operator: '当前用户'
+            });
+        }
+
+        // ===== Page 5: Experiment Form =====
+        function startExperiment() {
+            // Reset experiment data
+            experimentData = {
+                projectId: currentProject.id,
+                id: generateExpId(),
+                expNumber: currentProject.totalExperiments + 1,
+                startTime: new Date().toISOString(),
+                stepData: {}
+            };
+
+            // Fill basic info
+            document.getElementById('expId').value = experimentData.id;
+            document.getElementById('expNumber').value = `第 ${experimentData.expNumber} 次实验`;
+            document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expTime').value = new Date().toTimeString().slice(0, 5);
+            document.getElementById('expOperator').value = '';
+            document.getElementById('expLocation').value = '';
+            document.getElementById('expType').value = '';
+            document.getElementById('customTypeGroup').classList.add('hidden');
+
+            // Populate experiment types
+            const typeSelect = document.getElementById('expType');
+            typeSelect.innerHTML = '<option value="">请选择实验类型</option>' +
+                ExperimentTypes.map(t => `<option value="${t.value}">${t.label}</option>`).join('');
+
+            // Try to get location
+            getLocation();
+
+            navigateTo('experiment-form');
+        }
+
+        function generateExpId() {
+            const date = new Date();
+            const prefix = 'EXP';
+            const timestamp = date.getFullYear().toString().slice(2) +
+                String(date.getMonth() + 1).padStart(2, '0') +
+                String(date.getDate()).padStart(2, '0');
+            const random = Math.random().toString(36).substr(2, 4).toUpperCase();
+            return `${prefix}-${timestamp}-${random}`;
+        }
+
+        function getLocation() {
+            const locationInput = document.getElementById('expLocation');
+            const statusText = document.getElementById('locationStatus');
+
+            if (!navigator.geolocation) {
+                statusText.textContent = '浏览器不支持定位，请手动输入';
+                locationInput.placeholder = '请输入实验室地点';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lng = position.coords.longitude.toFixed(6);
+                    locationInput.value = `GPS: ${lat}, ${lng}`;
+                    statusText.textContent = '✅ 已获取GPS定位（可手动修改）';
+                },
+                (error) => {
+                    statusText.textContent = '无法获取定位，请手动输入';
+                    locationInput.placeholder = '请输入实验室地点';
+                },
+                { timeout: 10000, enableHighAccuracy: false }
+            );
+        }
+
+        function onExpTypeChange() {
+            const select = document.getElementById('expType');
+            const customGroup = document.getElementById('customTypeGroup');
+
+            if (select.value === 'other') {
+                customGroup.classList.remove('hidden');
+            } else {
+                customGroup.classList.add('hidden');
+            }
+        }
+
+        function startExperimentSteps() {
+            const operator = document.getElementById('expOperator').value.trim();
+            const location = document.getElementById('expLocation').value.trim();
+            const expType = document.getElementById('expType').value;
+            const customType = document.getElementById('customExpType').value.trim();
+
+            if (!operator) {
+                alert('请输入操作者姓名');
+                return;
+            }
+            if (!location) {
+                alert('请输入实验地点');
+                return;
+            }
+            if (!expType) {
+                alert('请选择实验类型');
+                return;
+            }
+            if (expType === 'other' && !customType) {
+                alert('请输入自定义实验类型');
+                return;
+            }
+
+            experimentData.operator = operator;
+            experimentData.location = location;
+            experimentData.type = expType === 'other' ? customType : expType;
+
+            currentStep = 1;
+            renderStep();
+            navigateTo('experiment-steps');
+
+            DataStore.addAuditLog({
+                projectId: currentProject.id,
+                action: '开始实验',
+                detail: `创建实验 ${experimentData.id}，类型: ${getExpTypeLabel(experimentData.type)}`,
+                operator: operator
+            });
+        }
+
+        // ===== Page 6: Experiment Steps =====
+        function renderStep() {
+            // Update step indicator
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update navigation buttons
+            document.getElementById('prevStepBtn').disabled = currentStep === 1;
+            document.getElementById('nextStepBtn').textContent = currentStep === 5 ? '提交记录' : '下一步';
+
+            // Render step content
+            const stepTitles = [
+                '步骤 1: 实验前准备',
+                '步骤 2: 样本与试剂处理',
+                '步骤 3: 核心实验操作',
+                '步骤 4: 质量控制与异常记录',
+                '步骤 5: 结果记录与提交'
+            ];
+
+            document.getElementById('stepTitle').textContent = stepTitles[currentStep - 1];
+
+            const stepContent = document.getElementById('stepContent');
+            const savedData = experimentData.stepData[`step${currentStep}`] || {};
+
+            switch (currentStep) {
+                case 1:
+                    stepContent.innerHTML = renderStep1(savedData);
+                    break;
+                case 2:
+                    stepContent.innerHTML = renderStep2(savedData);
+                    break;
+                case 3:
+                    stepContent.innerHTML = renderStep3(savedData, experimentData.type);
+                    break;
+                case 4:
+                    stepContent.innerHTML = renderStep4(savedData);
+                    break;
+                case 5:
+                    stepContent.innerHTML = renderStep5(savedData);
+                    break;
+            }
+
+            // Restore saved files if any
+            if (savedData.files) {
+                savedData.files.forEach(file => addFilePreview(file.name, file.type, file.size, currentStep));
+            }
+        }
+
+        function renderStep1(savedData) {
+            return `
+                <div class="alert alert-warning">
+                    <strong>⚠️ 关键记录点 1</strong><br>
+                    请拍照或录像记录实验前准备状态
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">核对SOP <span class="required">*</span></label>
+                    <select class="form-control" id="sopVerified" required>
+                        <option value="">请选择</option>
+                        <option value="yes" ${savedData.sopVerified === 'yes' ? 'selected' : ''}>✅ 已核对SOP</option>
+                        <option value="no" ${savedData.sopVerified === 'no' ? 'selected' : ''}>❌ 未核对</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">样本信息核对</label>
+                    <textarea class="form-control" id="sampleCheck" rows="2" placeholder="记录样本编号、数量、状态...">${savedData.sampleCheck || ''}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">试剂批号记录</label>
+                    <textarea class="form-control" id="reagentBatch" rows="2" placeholder="记录关键试剂名称、批号、有效期...">${savedData.reagentBatch || ''}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">仪器状态检查</label>
+                    <textarea class="form-control" id="equipmentStatus" rows="2" placeholder="记录仪器名称、状态、校准日期...">${savedData.equipmentStatus || ''}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">伦理与生物安全要求</label>
+                    <select class="form-control" id="ethicsCheck">
+                        <option value="">请选择</option>
+                        <option value="na" ${savedData.ethicsCheck === 'na' ? 'selected' : ''}>不适用</option>
+                        <option value="yes" ${savedData.ethicsCheck === 'yes' ? 'selected' : ''}>✅ 符合要求</option>
+                        <option value="no" ${savedData.ethicsCheck === 'no' ? 'selected' : ''}>❌ 不符合</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">实验前准备状态记录 <span class="required">*</span></label>
+                    <div class="upload-zone" onclick="document.getElementById('step1File').click()">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">点击拍照或选择文件</div>
+                        <div class="upload-hint">支持图片和视频</div>
+                    </div>
+                    <input type="file" id="step1File" class="file-input" accept="image/*,video/*" capture="environment" 
+                           onchange="handleFileUpload(this, 1)">
+                    <div id="step1Files"></div>
+                </div>
+            `;
+        }
+
+        function renderStep2(savedData) {
+            return `
+                <div class="form-group">
+                    <label class="form-label">样本编号</label>
+                    <input type="text" class="form-control" id="sampleId" placeholder="输入样本唯一编号" value="${savedData.sampleId || ''}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">样本处理方式</label>
+                    <textarea class="form-control" id="sampleProcess" rows="2" placeholder="描述样本处理步骤...">${savedData.sampleProcess || ''}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">试剂配制记录</label>
+                    <textarea class="form-control" id="reagentPrep" rows="3" placeholder="记录试剂配制方法、浓度、体积...">${savedData.reagentPrep || ''}</textarea>
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing);">
+                    <div class="form-group">
+                        <label class="form-label">浓度</label>
+                        <input type="text" class="form-control" id="concentration" placeholder="如: 10 mg/mL" value="${savedData.concentration || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">体积</label>
+                        <input type="text" class="form-control" id="volume" placeholder="如: 200 μL" value="${savedData.volume || ''}">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing);">
+                    <div class="form-group">
+                        <label class="form-label">温度</label>
+                        <input type="text" class="form-control" id="temperature" placeholder="如: 37°C" value="${savedData.temperature || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">时间</label>
+                        <input type="text" class="form-control" id="duration" placeholder="如: 2小时" value="${savedData.duration || ''}">
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep3(savedData, expType) {
+            const wbSteps = `
+                <div class="form-group">
+                    <label class="form-label">蛋白定量</label>
+                    <input type="text" class="form-control" id="proteinQuant" placeholder="记录定量方法和结果" value="${savedData.proteinQuant || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">上样</label>
+                    <input type="text" class="form-control" id="sampleLoading" placeholder="上样量、上样顺序..." value="${savedData.sampleLoading || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">电泳条件</label>
+                    <input type="text" class="form-control" id="electrophoresis" placeholder="电压、时间..." value="${savedData.electrophoresis || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">转膜条件</label>
+                    <input type="text" class="form-control" id="transfer" placeholder="电流、时间、膜类型..." value="${savedData.transfer || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">抗体信息</label>
+                    <textarea class="form-control" id="antibodyInfo" rows="2" placeholder="一抗、二抗名称、稀释比例...">${savedData.antibodyInfo || ''}</textarea>
+                </div>
+            `;
+
+            const pcrSteps = `
+                <div class="form-group">
+                    <label class="form-label">RNA质量检测</label>
+                    <input type="text" class="form-control" id="rnaQuality" placeholder="OD260/280比值" value="${savedData.rnaQuality || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">逆转录条件</label>
+                    <input type="text" class="form-control" id="rtCondition" placeholder="程序设置..." value="${savedData.rtCondition || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">qPCR程序</label>
+                    <textarea class="form-control" id="qpcrProgram" rows="2" placeholder="循环条件、退火温度...">${savedData.qpcrProgram || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">引物信息</label>
+                    <textarea class="form-control" id="primerInfo" rows="2" placeholder="引物序列、浓度...">${savedData.primerInfo || ''}</textarea>
+                </div>
+            `;
+
+            const cellSteps = `
+                <div class="form-group">
+                    <label class="form-label">细胞状态</label>
+                    <input type="text" class="form-control" id="cellStatus" placeholder="细胞形态、密度、污染情况..." value="${savedData.cellStatus || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">处理条件</label>
+                    <textarea class="form-control" id="treatment" rows="2" placeholder="药物浓度、处理时间...">${savedData.treatment || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">操作步骤</label>
+                    <textarea class="form-control" id="operationSteps" rows="3" placeholder="详细操作步骤...">${savedData.operationSteps || ''}</textarea>
+                </div>
+            `;
+
+            let typeSpecificSteps = cellSteps;
+            if (expType.includes('western') || expType.includes('wb')) {
+                typeSpecificSteps = wbSteps;
+            } else if (expType.includes('pcr') || expType.includes('qpcr')) {
+                typeSpecificSteps = pcrSteps;
+            }
+
+            return `
+                <div class="alert alert-warning">
+                    <strong>⚠️ 关键记录点 2</strong><br>
+                    请拍照或录像记录核心实验操作过程
+                </div>
+
+                ${typeSpecificSteps}
+
+                <div class="form-group">
+                    <label class="form-label">核心操作过程记录 <span class="required">*</span></label>
+                    <div class="upload-zone" onclick="document.getElementById('step3File').click()">
+                        <div class="upload-icon">📹</div>
+                        <div class="upload-text">点击拍照或录像</div>
+                        <div class="upload-hint">建议录制关键操作步骤</div>
+                    </div>
+                    <input type="file" id="step3File" class="file-input" accept="image/*,video/*" capture="environment" 
+                           onchange="handleFileUpload(this, 3)">
+                    <div id="step3Files"></div>
+                </div>
+            `;
+        }
+
+        function renderStep4(savedData) {
+            return `
+                <div class="form-group">
+                    <label class="form-label">阳性对照</label>
+                    <select class="form-control" id="positiveControl">
+                        <option value="">请选择</option>
+                        <option value="yes" ${savedData.positiveControl === 'yes' ? 'selected' : ''}>✅ 已设置</option>
+                        <option value="no" ${savedData.positiveControl === 'no' ? 'selected' : ''}>❌ 未设置</option>
+                        <option value="na" ${savedData.positiveControl === 'na' ? 'selected' : ''}>不适用</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">阴性对照</label>
+                    <select class="form-control" id="negativeControl">
+                        <option value="">请选择</option>
+                        <option value="yes" ${savedData.negativeControl === 'yes' ? 'selected' : ''}>✅ 已设置</option>
+                        <option value="no" ${savedData.negativeControl === 'no' ? 'selected' : ''}>❌ 未设置</option>
+                        <option value="na" ${savedData.negativeControl === 'na' ? 'selected' : ''}>不适用</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">空白对照</label>
+                    <select class="form-control" id="blankControl">
+                        <option value="">请选择</option>
+                        <option value="yes" ${savedData.blankControl === 'yes' ? 'selected' : ''}>✅ 已设置</option>
+                        <option value="no" ${savedData.blankControl === 'no' ? 'selected' : ''}>❌ 未设置</option>
+                        <option value="na" ${savedData.blankControl === 'na' ? 'selected' : ''}>不适用</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">重复样本</label>
+                    <input type="text" class="form-control" id="replicates" placeholder="如: 3个生物学重复" value="${savedData.replicates || ''}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">仪器参数</label>
+                    <textarea class="form-control" id="instrumentParams" rows="2" placeholder="记录关键仪器参数设置...">${savedData.instrumentParams || ''}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">是否偏离SOP</label>
+                    <select class="form-control" id="deviationFromSOP">
+                        <option value="no" ${savedData.deviationFromSOP === 'no' ? 'selected' : ''}>✅ 按SOP执行</option>
+                        <option value="yes" ${savedData.deviationFromSOP === 'yes' ? 'selected' : ''}>⚠️ 有偏离</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">异常说明</label>
+                    <textarea class="form-control" id="abnormalNote" rows="3" placeholder="如有异常，请详细说明...">${savedData.abnormalNote || ''}</textarea>
+                </div>
+            `;
+        }
+
+        function renderStep5(savedData) {
+            return `
+                <div class="alert alert-warning">
+                    <strong>⚠️ 关键记录点 3</strong><br>
+                    请上传实验结果或原始数据
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">原始数据上传 <span class="required">*</span></label>
+                    <div class="upload-zone" onclick="document.getElementById('step5File').click()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">点击上传原始数据</div>
+                        <div class="upload-hint">支持图片、视频、数据文件</div>
+                    </div>
+                    <input type="file" id="step5File" class="file-input" accept="image/*,video/*,.csv,.xlsx,.txt,.pdf" 
+                           onchange="handleFileUpload(this, 5)" multiple>
+                    <div id="step5Files"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">结果图片</label>
+                    <div class="upload-zone" onclick="document.getElementById('resultImageFile').click()">
+                        <div class="upload-icon">🖼️</div>
+                        <div class="upload-text">点击上传结果图片</div>
+                    </div>
+                    <input type="file" id="resultImageFile" class="file-input" accept="image/*" 
+                           onchange="handleFileUpload(this, 'result')" multiple>
+                    <div id="resultFiles"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">初步结论</label>
+                    <textarea class="form-control" id="conclusion" rows="3" placeholder="记录实验初步结论...">${savedData.conclusion || ''}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">是否达到预期</label>
+                    <select class="form-control" id="expectedResult">
+                        <option value="">请选择</option>
+                        <option value="yes" ${savedData.expectedResult === 'yes' ? 'selected' : ''}>✅ 达到预期</option>
+                        <option value="partial" ${savedData.expectedResult === 'partial' ? 'selected' : ''}>⚠️ 部分达到</option>
+                        <option value="no" ${savedData.expectedResult === 'no' ? 'selected' : ''}>❌ 未达到</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">是否需要复核</label>
+                    <select class="form-control" id="needReview">
+                        <option value="yes" ${savedData.needReview === 'yes' ? 'selected' : ''}>✅ 需要</option>
+                        <option value="no" ${savedData.needReview === 'no' ? 'selected' : ''}>❌ 不需要</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">下一步计划</label>
+                    <textarea class="form-control" id="nextPlan" rows="2" placeholder="记录下一步实验计划...">${savedData.nextPlan || ''}</textarea>
+                </div>
+            `;
+        }
+
+        function handleFileUpload(input, step) {
+            if (input.files && input.files.length > 0) {
+                const files = Array.from(input.files);
+                const containerId = step === 'result' ? 'resultFiles' : `step${step}Files`;
+                const container = document.getElementById(containerId);
+
+                files.forEach(file => {
+                    const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                    const fileData = {
+                        id: fileId,
+                        name: file.name,
+                        type: file.type,
+                        size: formatFileSize(file.size),
+                        step: step
+                    };
+
+                    // Store file reference (in real app, would upload to server)
+                    if (!experimentData.stepData[`step${step}`]) {
+                        experimentData.stepData[`step${step}`] = {};
+                    }
+                    if (!experimentData.stepData[`step${step}`].files) {
+                        experimentData.stepData[`step${step}`].files = [];
+                    }
+                    experimentData.stepData[`step${step}`].files.push(fileData);
+
+                    // Show preview
+                    addFilePreview(file.name, file.type, fileData.size, step, fileId);
+                });
+
+                // Clear input
+                input.value = '';
+
+                DataStore.addAuditLog({
+                    projectId: currentProject.id,
+                    action: '上传文件',
+                    detail: `步骤${step}上传 ${files.length} 个文件`,
+                    operator: experimentData.operator || '当前用户'
+                });
+            }
+        }
+
+        function addFilePreview(name, type, size, step, fileId) {
+            const containerId = step === 'result' ? 'resultFiles' : `step${step}Files`;
+            const container = document.getElementById(containerId);
+
+            const isImage = type && type.startsWith('image/');
+            const isVideo = type && type.startsWith('video/');
+            const icon = isImage ? '🖼️' : isVideo ? '🎬' : '📄';
+
+            const fileEl = document.createElement('div');
+            fileEl.className = 'file-preview';
+            fileEl.id = fileId;
+            fileEl.innerHTML = `
+                <div style="font-size: 1.5rem;">${icon}</div>
+                <div class="file-info">
+                    <div class="file-name">${name}</div>
+                    <div class="file-size">${size}</div>
+                </div>
+                <button class="file-remove" onclick="removeFile('${fileId}', ${step})">×</button>
+            `;
+
+            container.appendChild(fileEl);
+        }
+
+        function removeFile(fileId, step) {
+            const el = document.getElementById(fileId);
+            if (el) el.remove();
+
+            // Remove from data
+            const stepData = experimentData.stepData[`step${step}`];
+            if (stepData && stepData.files) {
+                stepData.files = stepData.files.filter(f => f.id !== fileId);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function collectStepData() {
+            const stepData = {};
+            const existingFiles = experimentData.stepData[`step${currentStep}`]?.files || [];
+
+            switch (currentStep) {
+                case 1:
+                    stepData.sopVerified = document.getElementById('sopVerified').value;
+                    stepData.sampleCheck = document.getElementById('sampleCheck').value;
+                    stepData.reagentBatch = document.getElementById('reagentBatch').value;
+                    stepData.equipmentStatus = document.getElementById('equipmentStatus').value;
+                    stepData.ethicsCheck = document.getElementById('ethicsCheck').value;
+                    break;
+                case 2:
+                    stepData.sampleId = document.getElementById('sampleId').value;
+                    stepData.sampleProcess = document.getElementById('sampleProcess').value;
+                    stepData.reagentPrep = document.getElementById('reagentPrep').value;
+                    stepData.concentration = document.getElementById('concentration').value;
+                    stepData.volume = document.getElementById('volume').value;
+                    stepData.temperature = document.getElementById('temperature').value;
+                    stepData.duration = document.getElementById('duration').value;
+                    break;
+                case 3:
+                    stepData.proteinQuant = document.getElementById('proteinQuant')?.value || '';
+                    stepData.sampleLoading = document.getElementById('sampleLoading')?.value || '';
+                    stepData.electrophoresis = document.getElementById('electrophoresis')?.value || '';
+                    stepData.transfer = document.getElementById('transfer')?.value || '';
+                    stepData.antibodyInfo = document.getElementById('antibodyInfo')?.value || '';
+                    stepData.rnaQuality = document.getElementById('rnaQuality')?.value || '';
+                    stepData.rtCondition = document.getElementById('rtCondition')?.value || '';
+                    stepData.qpcrProgram = document.getElementById('qpcrProgram')?.value || '';
+                    stepData.primerInfo = document.getElementById('primerInfo')?.value || '';
+                    stepData.cellStatus = document.getElementById('cellStatus')?.value || '';
+                    stepData.treatment = document.getElementById('treatment')?.value || '';
+                    stepData.operationSteps = document.getElementById('operationSteps')?.value || '';
+                    break;
+                case 4:
+                    stepData.positiveControl = document.getElementById('positiveControl').value;
+                    stepData.negativeControl = document.getElementById('negativeControl').value;
+                    stepData.blankControl = document.getElementById('blankControl').value;
+                    stepData.replicates = document.getElementById('replicates').value;
+                    stepData.instrumentParams = document.getElementById('instrumentParams').value;
+                    stepData.deviationFromSOP = document.getElementById('deviationFromSOP').value;
+                    stepData.abnormalNote = document.getElementById('abnormalNote').value;
+                    break;
+                case 5:
+                    stepData.conclusion = document.getElementById('conclusion').value;
+                    stepData.expectedResult = document.getElementById('expectedResult').value;
+                    stepData.needReview = document.getElementById('needReview').value;
+                    stepData.nextPlan = document.getElementById('nextPlan').value;
+                    break;
+            }
+
+            stepData.files = existingFiles;
+            experimentData.stepData[`step${currentStep}`] = stepData;
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                collectStepData();
+                currentStep--;
+                renderStep();
+            }
+        }
+
+        function nextStep() {
+            collectStepData();
+
+            // Validate required fields
+            if (currentStep === 1) {
+                if (!document.getElementById('sopVerified').value) {
+                    alert('请确认SOP核对状态');
+                    return;
+                }
+            }
+
+            if (currentStep < 5) {
+                currentStep++;
+                renderStep();
+            } else {
+                // Check required files before submit
+                const missing = [];
+                if (!experimentData.stepData.step1?.files?.length) {
+                    missing.push('关键记录点1：实验前准备状态');
+                }
+                if (!experimentData.stepData.step3?.files?.length) {
+                    missing.push('关键记录点2：核心实验操作过程');
+                }
+                if (!experimentData.stepData.step5?.files?.length) {
+                    missing.push('关键记录点3：实验结果或原始数据');
+                }
+
+                if (missing.length > 0) {
+                    const list = document.getElementById('missingRecordsList');
+                    list.innerHTML = missing.map(m => `<li>${m}</li>`).join('');
+                    document.getElementById('missingRecordModal').classList.add('active');
+                } else {
+                    submitExperiment();
+                }
+            }
+        }
+
+        function showStepDetail() {
+            const details = {
+                1: {
+                    title: '实验前准备 - 详细说明',
+                    content: `
+                        <p><strong>1. 核对SOP</strong></p>
+                        <p>实验前必须仔细阅读并理解相关SOP，确认操作步骤和注意事项。</p>
+                        
+                        <p><strong>2. 样本核对</strong></p>
+                        <p>检查样本编号、数量、保存状态，确保样本信息与实验记录一致。</p>
+                        
+                        <p><strong>3. 试剂核对</strong></p>
+                        <p>记录试剂名称、批号、有效期，检查试剂是否过期或变质。</p>
+                        
+                        <p><strong>4. 仪器检查</strong></p>
+                        <p>确认仪器正常运行，参数设置正确，校准日期在有效期内。</p>
+                        
+                        <p><strong>5. 伦理与生物安全</strong></p>
+                        <p>涉及人体样本或动物实验时，确认符合伦理审批要求。</p>
+                    `
+                },
+                2: {
+                    title: '样本与试剂处理 - 详细说明',
+                    content: `
+                        <p><strong>样本处理要点：</strong></p>
+                        <ul>
+                            <li>记录样本唯一编号，确保可追溯</li>
+                            <li>描述样本处理的具体步骤</li>
+                            <li>记录处理时间、温度等关键参数</li>
+                        </ul>
+                        
+                        <p><strong>试剂配制要点：</strong></p>
+                        <ul>
+                            <li>记录试剂配制方法和计算公式</li>
+                            <li>标注试剂浓度、体积</li>
+                            <li>记录配制时间和有效期</li>
+                        </ul>
+                    `
+                },
+                3: {
+                    title: '核心实验操作 - 详细说明',
+                    content: `
+                        <p><strong>操作记录要求：</strong></p>
+                        <ul>
+                            <li>详细记录每一步操作的时间点</li>
+                            <li>记录关键仪器参数</li>
+                            <li>拍照或录像记录关键步骤</li>
+                            <li>如有偏离SOP的情况需特别说明</li>
+                        </ul>
+                        
+                        <p><strong>常见问题：</strong></p>
+                        <ul>
+                            <li>操作中断时如何处理</li>
+                            <li>异常现象的识别和记录</li>
+                            <li>重复实验的标记方法</li>
+                        </ul>
+                    `
+                },
+                4: {
+                    title: '质量控制 - 详细说明',
+                    content: `
+                        <p><strong>对照设置：</strong></p>
+                        <ul>
+                            <li><strong>阳性对照：</strong>确认实验体系正常工作</li>
+                            <li><strong>阴性对照：</strong>排除假阳性结果</li>
+                            <li><strong>空白对照：</strong>排除背景干扰</li>
+                        </ul>
+                        
+                        <p><strong>重复性要求：</strong></p>
+                        <ul>
+                            <li>建议至少3个生物学重复</li>
+                            <li>技术重复根据实验类型确定</li>
+                            <li>记录重复间的变异情况</li>
+                        </ul>
+                    `
+                },
+                5: {
+                    title: '结果记录 - 详细说明',
+                    content: `
+                        <p><strong>数据保存要求：</strong></p>
+                        <ul>
+                            <li>原始数据必须完整保存</li>
+                            <li>结果图片需清晰、有标尺</li>
+                            <li>数据文件命名规范</li>
+                            <li>及时备份重要数据</li>
+                        </ul>
+                        
+                        <p><strong>结果分析：</strong></p>
+                        <ul>
+                            <li>客观记录实验结果</li>
+                            <li>与预期结果比较</li>
+                            <li>分析可能的原因</li>
+                            <li>规划后续实验</li>
+                        </ul>
+                    `
+                }
+            };
+
+            const detail = details[currentStep];
+            document.getElementById('modalTitle').textContent = detail.title;
+            document.getElementById('modalBody').innerHTML = detail.content;
+            document.getElementById('stepDetailModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('stepDetailModal').classList.remove('active');
+        }
+
+        function closeMissingModal() {
+            document.getElementById('missingRecordModal').classList.remove('active');
+        }
+
+        function submitWithMissingReason() {
+            const reason = document.getElementById('missingReason').value.trim();
+            if (!reason) {
+                alert('请填写缺失原因');
+                return;
+            }
+            experimentData.missingReason = reason;
+            closeMissingModal();
+            submitExperiment();
+        }
+
+        function submitExperiment() {
+            experimentData.endTime = new Date().toISOString();
+            experimentData.reviewStatus = 'pending';
+            experimentData.completeness = {
+                step1: !!experimentData.stepData.step1?.files?.length,
+                step2: true, // Step 2 doesn't require files
+                step3: !!experimentData.stepData.step3?.files?.length,
+                step4: true, // Step 4 doesn't require files
+                step5: !!experimentData.stepData.step5?.files?.length
+            };
+
+            // Save experiment
+            DataStore.saveExperiment(experimentData);
+
+            // Update project stats
+            currentProject.totalExperiments++;
+            currentProject.lastExpDate = new Date().toISOString().split('T')[0];
+            DataStore.saveProject(currentProject);
+
+            // Add audit log
+            DataStore.addAuditLog({
+                projectId: currentProject.id,
+                action: '提交实验',
+                detail: `提交实验 ${experimentData.id}，状态: 待复核`,
+                operator: experimentData.operator
+            });
+
+            alert('实验记录提交成功！等待负责人复核。');
+
+            // Reset and go back
+            navigationStack = [];
+            openProject(currentProject.id);
+        }
+
+        // ===== Page 7: Experiment Detail =====
+        function viewExperimentDetail(expId) {
+            const exp = DataStore.getExperiment(expId);
+            if (!exp) return;
+
+            currentExperiment = exp;
+            const container = document.getElementById('experimentDetail');
+
+            const completeness = exp.completeness || {};
+            const completeCount = [completeness.step1, completeness.step3, completeness.step5].filter(Boolean).length;
+
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">🧪 实验详情</span>
+                        ${getReviewBadge(exp.reviewStatus)}
+                    </div>
+                    <div class="card-body">
+                        <table style="width: 100%; font-size: 0.9rem;">
+                            <tr>
+                                <td style="padding: 8px 0; width: 100px; color: var(--gray-500);">实验编号</td>
+                                <td style="padding: 8px 0; font-weight: 500;">${exp.id}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: var(--gray-500);">实验次数</td>
+                                <td style="padding: 8px 0;">第 ${exp.expNumber} 次</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: var(--gray-500);">实验类型</td>
+                                <td style="padding: 8px 0;">${getExpTypeLabel(exp.type)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: var(--gray-500);">操作者</td>
+                                <td style="padding: 8px 0;">${exp.operator}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: var(--gray-500);">开始时间</td>
+                                <td style="padding: 8px 0;">${formatDateTime(exp.startTime)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: var(--gray-500);">结束时间</td>
+                                <td style="padding: 8px 0;">${exp.endTime ? formatDateTime(exp.endTime) : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: var(--gray-500);">实验地点</td>
+                                <td style="padding: 8px 0;">${exp.location}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: var(--gray-500);">完整性</td>
+                                <td style="padding: 8px 0;">${completeCount}/3 关键记录点</td>
+                            </tr>
+                        </table>
+
+                        ${exp.missingReason ? `
+                            <div class="alert alert-warning" style="margin-top: var(--spacing);">
+                                <strong>缺失原因：</strong>${exp.missingReason}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                ${renderStepSummary(exp.stepData)}
+
+                ${exp.reviewStatus === 'pending' ? `
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">✅ 负责人复核</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">复核意见</label>
+                                <textarea class="form-control" id="reviewComment" rows="2" placeholder="请输入复核意见..."></textarea>
+                            </div>
+                            <div class="review-actions">
+                                <button class="btn btn-success" onclick="reviewExperiment('approved')">通过</button>
+                                <button class="btn btn-warning" onclick="reviewExperiment('rejected')">退回修改</button>
+                                <button class="btn btn-info" onclick="reviewExperiment('need_data')">要求补充数据</button>
+                                <button class="btn btn-danger" onclick="reviewExperiment('abnormal')">标记异常</button>
+                            </div>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">✅ 复核结果</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>复核状态：</strong>${getReviewStatusText(exp.reviewStatus)}</p>
+                            ${exp.reviewComment ? `<p><strong>复核意见：</strong>${exp.reviewComment}</p>` : ''}
+                            ${exp.reviewTime ? `<p><strong>复核时间：</strong>${formatDateTime(exp.reviewTime)}</p>` : ''}
+                        </div>
+                    </div>
+                `}
+            `;
+
+            navigateTo('experiment-detail');
+        }
+
+        function renderStepSummary(stepData) {
+            if (!stepData) return '';
+
+            const steps = [];
+            
+            if (stepData.step1) {
+                steps.push(`
+                    <div class="card" style="margin-bottom: var(--spacing);">
+                        <div class="card-header">
+                            <span class="card-title">步骤1: 实验前准备</span>
+                        </div>
+                        <div class="card-body" style="font-size: 0.85rem;">
+                            <p>SOP核对: ${stepData.step1.sopVerified === 'yes' ? '✅' : '❌'}</p>
+                            ${stepData.step1.sampleCheck ? `<p>样本核对: ${stepData.step1.sampleCheck}</p>` : ''}
+                            ${stepData.step1.reagentBatch ? `<p>试剂批号: ${stepData.step1.reagentBatch}</p>` : ''}
+                            ${stepData.step1.files?.length ? `<p>📷 已上传 ${stepData.step1.files.length} 个文件</p>` : '⚠️ 无影像记录'}
+                        </div>
+                    </div>
+                `);
+            }
+
+            if (stepData.step2) {
+                steps.push(`
+                    <div class="card" style="margin-bottom: var(--spacing);">
+                        <div class="card-header">
+                            <span class="card-title">步骤2: 样本与试剂处理</span>
+                        </div>
+                        <div class="card-body" style="font-size: 0.85rem;">
+                            ${stepData.step2.sampleId ? `<p>样本编号: ${stepData.step2.sampleId}</p>` : ''}
+                            ${stepData.step2.concentration ? `<p>浓度: ${stepData.step2.concentration}</p>` : ''}
+                            ${stepData.step2.volume ? `<p>体积: ${stepData.step2.volume}</p>` : ''}
+                        </div>
+                    </div>
+                `);
+            }
+
+            if (stepData.step3) {
+                steps.push(`
+                    <div class="card" style="margin-bottom: var(--spacing);">
+                        <div class="card-header">
+                            <span class="card-title">步骤3: 核心实验操作</span>
+                        </div>
+                        <div class="card-body" style="font-size: 0.85rem;">
+                            ${stepData.step3.files?.length ? `<p>📹 已上传 ${stepData.step3.files.length} 个文件</p>` : '⚠️ 无影像记录'}
+                        </div>
+                    </div>
+                `);
+            }
+
+            if (stepData.step4) {
+                steps.push(`
+                    <div class="card" style="margin-bottom: var(--spacing);">
+                        <div class="card-header">
+                            <span class="card-title">步骤4: 质量控制</span>
+                        </div>
+                        <div class="card-body" style="font-size: 0.85rem;">
+                            <p>阳性对照: ${stepData.step4.positiveControl === 'yes' ? '✅' : stepData.step4.positiveControl === 'no' ? '❌' : 'N/A'}</p>
+                            <p>阴性对照: ${stepData.step4.negativeControl === 'yes' ? '✅' : stepData.step4.negativeControl === 'no' ? '❌' : 'N/A'}</p>
+                            ${stepData.step4.abnormalNote ? `<p style="color: var(--danger);">异常: ${stepData.step4.abnormalNote}</p>` : ''}
+                        </div>
+                    </div>
+                `);
+            }
+
+            if (stepData.step5) {
+                steps.push(`
+                    <div class="card" style="margin-bottom: var(--spacing);">
+                        <div class="card-header">
+                            <span class="card-title">步骤5: 结果记录</span>
+                        </div>
+                        <div class="card-body" style="font-size: 0.85rem;">
+                            ${stepData.step5.files?.length ? `<p>📁 已上传 ${stepData.step5.files.length} 个文件</p>` : '⚠️ 无原始数据'}
+                            ${stepData.step5.conclusion ? `<p>结论: ${stepData.step5.conclusion}</p>` : ''}
+                            ${stepData.step5.expectedResult ? `<p>是否达预期: ${stepData.step5.expectedResult === 'yes' ? '✅' : stepData.step5.expectedResult === 'no' ? '❌' : '⚠️部分'}</p>` : ''}
+                        </div>
+                    </div>
+                `);
+            }
+
+            return steps.join('');
+        }
+
+        function getReviewStatusText(status) {
+            const texts = {
+                pending: '待复核',
+                approved: '已通过',
+                rejected: '退回修改',
+                need_data: '要求补充数据',
+                abnormal: '标记异常'
+            };
+            return texts[status] || status;
+        }
+
+        function reviewExperiment(status) {
+            const comment = document.getElementById('reviewComment').value.trim();
+            
+            currentExperiment.reviewStatus = status;
+            currentExperiment.reviewComment = comment;
+            currentExperiment.reviewTime = new Date().toISOString();
+            currentExperiment.reviewer = '负责人';
+
+            DataStore.saveExperiment(currentExperiment);
+
+            DataStore.addAuditLog({
+                projectId: currentProject.id,
+                action: '实验复核',
+                detail: `实验 ${currentExperiment.id} 复核结果: ${getReviewStatusText(status)}`,
+                operator: '负责人'
+            });
+
+            alert('复核完成！');
+            viewExperimentDetail(currentExperiment.id);
+        }
+
+        // ===== Export All Data =====
+        function exportAllData() {
+            const data = DataStore.exportAll();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `research_chihuahua_full_export_${formatDateFile(new Date())}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('全部数据导出成功！');
+        }
+
+        // ===== Initialization =====
+        document.addEventListener('DOMContentLoaded', function() {
+            DataStore.init();
+            renderProjectList();
+        });
+    </script>
+</body>
+</html>
