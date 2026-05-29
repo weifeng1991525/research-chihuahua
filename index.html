@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>科研吉娃娃 Research Chihuahua</title>
+    <title>科研吉娃娃 Genewawa</title>
     <style>
         /* ===== CSS Variables & Reset ===== */
         :root {
@@ -111,13 +111,17 @@
 
         .logo-icon {
             font-size: 2rem;
-            animation: bounce 2s infinite;
+            animation: pulse 3s ease-in-out infinite;
+            display: flex;
+            align-items: center;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.05); }
         }
+
+        
 
         .logo-text {
             font-size: 1.1rem;
@@ -1038,10 +1042,10 @@
         <header class="app-header">
             <div class="header-content">
                 <div class="logo-section">
-                    <span class="logo-icon">🐕</span>
+                    <span class="logo-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#ffffff" opacity="0.3"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79C9.84 7.31 10.89 6 12 6s2.16 1.31 5.79 4.21c.13.58.21 1.17.21 1.79 0 4.08-3.05 7.44-7 7.93z" fill="#ffffff"/><path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2-.9 2-2 2zm0 3c-.55 0-1 .45-1 1s.45 1 1 1-.45 1-1 1zm-3-1c-.55 0-1 .45-1 1s.45 1 1 1-.45 1-1 1zm6 0c-.55 0-1 .45-1 1s.45 1 1 1-.45 1-1 1z" fill="#ffffff" opacity="0.7"/><circle cx="12" cy="12" r="10" stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.5"/><path d="M7 12h10M12 7v10" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg></span>
                     <div>
                         <div class="logo-text">科研吉娃娃</div>
-                        <div class="logo-subtitle">Research Chihuahua</div>
+                        <div class="logo-subtitle">Genewawa</div>
                     </div>
                 </div>
                 <button class="back-btn" id="backBtn" onclick="goBack()">
@@ -2246,7 +2250,7 @@
             container.innerHTML = `
                 <div style="padding: 40px; max-width: 800px; margin: 0 auto;">
                     <h1 style="text-align: center; color: var(--primary-blue); margin-bottom: 8px;">
-                        科研吉娃娃 - 实验记录报告
+                        科研吉娃娃 Genewawa - 实验记录报告
                     </h1>
                     <h2 style="text-align: center; font-weight: normal; margin-bottom: 32px;">
                         ${currentProject.name}
@@ -2310,7 +2314,7 @@
 
                     <div style="margin-top: 48px; text-align: center; font-size: 12px; color: #6c757d;">
                         <p>生成时间：${new Date().toLocaleString('zh-CN')}</p>
-                        <p>科研吉娃娃 Research Chihuahua</p>
+                        <p>科研吉娃娃 Genewawa</p>
                     </div>
                 </div>
             `;
@@ -2981,18 +2985,15 @@
                 case 1:
                     stepData.sopVerified = document.getElementById('sopVerified').value;
                     stepData.sampleCheck = document.getElementById('sampleCheck').value;
-                    stepData.reagentBatch = document.getElementById('reagentBatch').value;
                     stepData.equipmentStatus = document.getElementById('equipmentStatus').value;
-                    stepData.ethicsCheck = document.getElementById('ethicsCheck').value;
                     break;
                 case 2:
-                    stepData.sampleId = document.getElementById('sampleId').value;
-                    stepData.sampleProcess = document.getElementById('sampleProcess').value;
-                    stepData.reagentPrep = document.getElementById('reagentPrep').value;
-                    stepData.concentration = document.getElementById('concentration').value;
-                    stepData.volume = document.getElementById('volume').value;
-                    stepData.temperature = document.getElementById('temperature').value;
-                    stepData.duration = document.getElementById('duration').value;
+                    stepData.sampleId = document.getElementById('sampleId')?.value || '';
+                    stepData.sampleProcess = document.getElementById('sampleProcess')?.value || '';
+                    stepData.reagentPrep = document.getElementById('reagentPrep')?.value || '';
+                    stepData.concentration = document.getElementById('concentration')?.value || '';
+                    stepData.volume = document.getElementById('volume')?.value || '';
+                    stepData.temperature = document.getElementById('temperature')?.value || '';
                     break;
                 case 3:
                     stepData.proteinQuant = document.getElementById('proteinQuant')?.value || '';
@@ -3009,19 +3010,16 @@
                     stepData.operationSteps = document.getElementById('operationSteps')?.value || '';
                     break;
                 case 4:
-                    stepData.positiveControl = document.getElementById('positiveControl').value;
-                    stepData.negativeControl = document.getElementById('negativeControl').value;
-                    stepData.blankControl = document.getElementById('blankControl').value;
-                    stepData.replicates = document.getElementById('replicates').value;
-                    stepData.instrumentParams = document.getElementById('instrumentParams').value;
-                    stepData.deviationFromSOP = document.getElementById('deviationFromSOP').value;
-                    stepData.abnormalNote = document.getElementById('abnormalNote').value;
+                    stepData.positiveControl = document.getElementById('positiveControl')?.value || '';
+                    stepData.negativeControl = document.getElementById('negativeControl')?.value || '';
+                    stepData.replicates = document.getElementById('replicates')?.value || '';
+                    stepData.deviationFromSOP = document.getElementById('deviationFromSOP')?.value || '';
+                    stepData.abnormalNote = document.getElementById('abnormalNote')?.value || '';
                     break;
                 case 5:
-                    stepData.conclusion = document.getElementById('conclusion').value;
-                    stepData.expectedResult = document.getElementById('expectedResult').value;
-                    stepData.needReview = document.getElementById('needReview').value;
-                    stepData.nextPlan = document.getElementById('nextPlan').value;
+                    stepData.conclusion = document.getElementById('conclusion')?.value || '';
+                    stepData.expectedResult = document.getElementById('expectedResult')?.value || '';
+                    stepData.nextPlan = document.getElementById('nextPlan')?.value || '';
                     break;
             }
 
@@ -3075,107 +3073,235 @@
         }
 
         function showStepDetail() {
-            const details = {
-                1: {
-                    title: '实验前准备 - 详细说明',
-                    content: `
-                        <p><strong>1. 核对SOP</strong></p>
-                        <p>实验前必须仔细阅读并理解相关SOP，确认操作步骤和注意事项。</p>
-                        
-                        <p><strong>2. 样本核对</strong></p>
-                        <p>检查样本编号、数量、保存状态，确保样本信息与实验记录一致。</p>
-                        
-                        <p><strong>3. 试剂核对</strong></p>
-                        <p>记录试剂名称、批号、有效期，检查试剂是否过期或变质。</p>
-                        
-                        <p><strong>4. 仪器检查</strong></p>
-                        <p>确认仪器正常运行，参数设置正确，校准日期在有效期内。</p>
-                        
-                        <p><strong>5. 伦理与生物安全</strong></p>
-                        <p>涉及人体样本或动物实验时，确认符合伦理审批要求。</p>
-                    `
-                },
-                2: {
-                    title: '样本与试剂处理 - 详细说明',
-                    content: `
-                        <p><strong>样本处理要点：</strong></p>
-                        <ul>
-                            <li>记录样本唯一编号，确保可追溯</li>
-                            <li>描述样本处理的具体步骤</li>
-                            <li>记录处理时间、温度等关键参数</li>
-                        </ul>
-                        
-                        <p><strong>试剂配制要点：</strong></p>
-                        <ul>
-                            <li>记录试剂配制方法和计算公式</li>
-                            <li>标注试剂浓度、体积</li>
-                            <li>记录配制时间和有效期</li>
-                        </ul>
-                    `
-                },
-                3: {
-                    title: '核心实验操作 - 详细说明',
-                    content: `
-                        <p><strong>操作记录要求：</strong></p>
-                        <ul>
-                            <li>详细记录每一步操作的时间点</li>
-                            <li>记录关键仪器参数</li>
-                            <li>拍照或录像记录关键步骤</li>
-                            <li>如有偏离SOP的情况需特别说明</li>
-                        </ul>
-                        
-                        <p><strong>常见问题：</strong></p>
-                        <ul>
-                            <li>操作中断时如何处理</li>
-                            <li>异常现象的识别和记录</li>
-                            <li>重复实验的标记方法</li>
-                        </ul>
-                    `
-                },
-                4: {
-                    title: '质量控制 - 详细说明',
-                    content: `
-                        <p><strong>对照设置：</strong></p>
-                        <ul>
-                            <li><strong>阳性对照：</strong>确认实验体系正常工作</li>
-                            <li><strong>阴性对照：</strong>排除假阳性结果</li>
-                            <li><strong>空白对照：</strong>排除背景干扰</li>
-                        </ul>
-                        
-                        <p><strong>重复性要求：</strong></p>
-                        <ul>
-                            <li>建议至少3个生物学重复</li>
-                            <li>技术重复根据实验类型确定</li>
-                            <li>记录重复间的变异情况</li>
-                        </ul>
-                    `
-                },
-                5: {
-                    title: '结果记录 - 详细说明',
-                    content: `
-                        <p><strong>数据保存要求：</strong></p>
-                        <ul>
-                            <li>原始数据必须完整保存</li>
-                            <li>结果图片需清晰、有标尺</li>
-                            <li>数据文件命名规范</li>
-                            <li>及时备份重要数据</li>
-                        </ul>
-                        
-                        <p><strong>结果分析：</strong></p>
-                        <ul>
-                            <li>客观记录实验结果</li>
-                            <li>与预期结果比较</li>
-                            <li>分析可能的原因</li>
-                            <li>规划后续实验</li>
-                        </ul>
-                    `
-                }
-            };
-
-            const detail = details[currentStep];
+            const expType = experimentData.type || '';
+            const manuals = getCompleteManuals(expType);
+            const detail = manuals[currentStep] || manuals[1];
             document.getElementById('modalTitle').textContent = detail.title;
             document.getElementById('modalBody').innerHTML = detail.content;
             document.getElementById('stepDetailModal').classList.add('active');
+        }
+
+        function getCompleteManuals(expType) {
+            const isWB = expType.includes('western') || expType.includes('wb');
+            const isPCR = expType.includes('pcr') || expType.includes('qpcr');
+            const isCell = expType.includes('cell') || expType.includes('cck') || expType.includes('edu') || expType.includes('apoptosis') || expType.includes('cycle') || expType.includes('transwell') || expType.includes('wound') || expType.includes('clone');
+            const isAnimal = expType.includes('animal') || expType.includes('xenograft') || expType.includes('tumor') || expType.includes('dosing') || expType.includes('injection') || expType.includes('harvest') || expType.includes('behavior') || expType.includes('survival');
+            const isIHC = expType.includes('ihc') || expType.includes('he') || expType.includes('masson') || expType.includes('stain');
+            const isSeq = expType.includes('seq') || expType.includes('library') || expType.includes('chip');
+
+            const step1 = {
+                title: '步骤1: 实验前准备 — 完整操作手册',
+                content: isWB ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">Western Blot 实验前准备</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>配制RIPA裂解液</strong>：RIPA基础液+蛋白酶抑制剂(cOmplete™ EDTA-free, 1片/50mL)+磷酸酶抑制剂(Na₃VO₄ 1mM, NaF 50mM)，冰上预冷</li>
+                        <li><strong>准备电泳相关</strong>：配制分离胶(8-15%，依蛋白分子量)和浓缩胶(5%)，或使用预制胶；电泳缓冲液(Tris 25mM, Glycine 192mM, SDS 0.1%)</li>
+                        <li><strong>准备转膜相关</strong>：PVDF膜剪裁合适大小→100%甲醇浸泡10-30s激活→转膜缓冲液(Tris 25mM, Glycine 192mM, Methanol 20%)中浸泡</li>
+                        <li><strong>准备抗体</strong>：确认一抗(名称/宿主/稀释比/批号)和HRP二抗在有效期内；封闭液(5%脱脂奶粉/TBST)现配</li>
+                        <li><strong>仪器检查</strong>：电泳槽、转膜槽、摇床、化学发光成像系统均正常；冰浴准备(转膜降温用)</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        ⚠️ 关键提醒：①全程冰上操作蛋白提取 ②PVDF膜必须甲醇活化 ③磷酸化蛋白用BSA封闭(不用牛奶) ④ECL底物避光保存
+                    </div>
+                ` : isPCR ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">qPCR 实验前准备</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>引物验证</strong>：确认引物Tm 58-62°C，产物80-200bp；琼脂糖凝胶电泳验证单条带；标准曲线验证扩增效率90-110%</li>
+                        <li><strong>cDNA准备</strong>：RNA逆转录产物稀释5-10倍；Nanodrop检测浓度和纯度(A260/280 1.8-2.0)</li>
+                        <li><strong>Master Mix准备</strong>：SYBR Green Master Mix冰上解冻；Nuclease-free Water准备</li>
+                        <li><strong>96孔板设计</strong>：每样品3个技术重复+NTC(无模板对照)+标准曲线(如需)；记录加样布局图</li>
+                        <li><strong>仪器检查</strong>：qPCR仪开机预热；确认荧光通道设置正确；数据保存路径设置</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        ⚠️ 关键提醒：①分区操作(模板制备-反应配制-上机) ②内参基因需验证稳定性 ③NTC必须无扩增 ④技术重复CV<5%
+                    </div>
+                ` : isCell ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">细胞实验前准备</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>细胞状态检查</strong>：倒置显微镜100×观察细胞形态、密度、有无污染(浑浊/漂浮颗粒/黑点)</li>
+                        <li><strong>培养基准备</strong>：完全培养基预热至37°C；确认血清批号一致</li>
+                        <li><strong>试剂准备</strong>：胰酶(0.25% EDTA，37°C预热)；PBS(预热)；药物/处理试剂按方案配制</li>
+                        <li><strong>耗材准备</strong>：培养皿/板、移液器枪头(灭菌)、离心管、计数板或自动计数仪</li>
+                        <li><strong>CO2培养箱检查</strong>：温度37°C、CO2浓度5%、湿度正常；水盘有水</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        ⚠️ 关键提醒：①细胞汇合度60-80%时操作最佳 ②定期检测支原体 ③对数期细胞活力最好 ④无菌操作全程在生物安全柜内
+                    </div>
+                ` : isAnimal ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">动物实验前准备</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>伦理确认</strong>：IACUC方案在有效期内；明确伦理终点(肿瘤≤1500mm³或直径≤1.5cm；体重下降>20%)</li>
+                        <li><strong>动物检查</strong>：称重记录；检查精神状态、活动、进食、饮水、皮毛、排泄是否正常</li>
+                        <li><strong>给药准备</strong>：按体重计算给药剂量(体积:小鼠i.g. 10mL/kg, i.p. 5-10mL/kg)；药物现配</li>
+                        <li><strong>器械准备</strong>：灌胃针/注射器(型号正确)；麻醉剂(如需)；镇痛药(术后)；卡尺(测肿瘤)</li>
+                        <li><strong>分组方案</strong>：随机数字表法分组；各组间体重差异<10%；记录分组编号</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        ⚠️ 关键提醒：①3R原则(替代/减少/优化) ②随机分组+盲法评估 ③术后必须镇痛 ④每日观察动物福利 ⑤到达伦理终点必须人道处理
+                    </div>
+                ` : isIHC ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">病理染色实验前准备</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>切片准备</strong>：石蜡切片3-5μm；60°C烤箱烤片1-2h防脱片；或冰冻切片OCT包埋-80°C保存</li>
+                        <li><strong>抗原修复液</strong>：柠檬酸钠pH6.0(微波)或EDTA pH9.0(高压)；预热微波炉/高压锅</li>
+                        <li><strong>抗体准备</strong>：确认一抗克隆号、稀释比、修复方式；HRP二抗准备；DAB显色试剂盒现配</li>
+                        <li><strong>对照设置</strong>：阳性对照(已知阳性组织)；阴性对照(PBS替代一抗)</li>
+                        <li><strong>其他试剂</strong>：3%H₂O₂(淬灭内源酶)；5%BSA(封闭)；苏木素(复染)；梯度乙醇+二甲苯</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        ⚠️ 关键提醒：①阳性对照和阴性对照必须同时做 ②DAB显色时间需优化(显微镜下监控) ③切片全程保持湿润
+                    </div>
+                ` : `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">实验前准备 — 通用操作手册</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>核对SOP</strong>：仔细阅读实验相关SOP，确认操作步骤、所需材料和注意事项</li>
+                        <li><strong>样本核对</strong>：检查样本编号、数量、保存状态，确保信息与实验记录一致</li>
+                        <li><strong>试剂核对</strong>：记录关键试剂名称、批号、有效期；检查是否过期或变质</li>
+                        <li><strong>仪器检查</strong>：确认仪器正常运行，参数设置正确，校准日期在有效期内</li>
+                        <li><strong>安全确认</strong>：涉及人体/动物实验确认伦理审批；生物安全等级确认；个人防护装备齐全</li>
+                    </ol>
+                `
+            };
+
+            const step2 = {
+                title: '步骤2: 样本与试剂处理 — 完整操作手册',
+                content: isWB ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">蛋白提取与定量</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>细胞裂解</strong>：弃培养基→预冷PBS洗涤2次→加RIPA裂解液(6cm皿加200μL，10cm皿加500μL)→冰上放置30min(每10min涡旋10s)</li>
+                        <li><strong>离心收集</strong>：14000g 4°C离心15min→小心吸取上清至新管(避开脂质层)→弃沉淀</li>
+                        <li><strong>BCA定量</strong>：BSA标准曲线(0/250/500/1000/1500/2000μg/mL)→取2μL样品+200μL BCA工作液→37°C 30min→562nm检测</li>
+                        <li><strong>浓度调整</strong>：用裂解液将所有样品调整至同一浓度(如2μg/μL)→计算上样体积(20-40μg蛋白)</li>
+                        <li><strong>样品变性</strong>：蛋白样品+5×Loading Buffer(4:1)→95°C金属浴5min→短暂离心→冰上备用</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 蛋白定量标准曲线R²应>0.99；样品浓度应在标准曲线线性范围内；若浓度过高需稀释后重新定量
+                    </div>
+                ` : isPCR ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">qPCR反应体系配制</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>体系配制(20μL)</strong>：2×SYBR Green Master Mix 10μL + 正向引物(10μM) 0.4μL + 反向引物(10μM) 0.4μL + cDNA 2μL + Nuclease-free Water 7.2μL</li>
+                        <li><strong>加样</strong>：按96孔板布局图加入对应孔中→每样品3个技术重复→NTC加水替代cDNA</li>
+                        <li><strong>封膜</strong>：光学封膜覆盖→离心500rpm 1min去除气泡→确认无气泡</li>
+                        <li><strong>上机</strong>：放入qPCR仪→选择对应程序文件→确认荧光采集通道</li>
+                        <li><strong>PCR程序</strong>：预变性95°C 30s → (变性95°C 5s → 退火/延伸60°C 30s采集荧光)×40循环 → 熔解曲线65°C→95°C</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 加样在冰上操作；先配Master Mix混合液再分装(减少孔间差异)；避免产生气泡(影响荧光检测)
+                    </div>
+                ` : `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">样本与试剂处理</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>样本编号</strong>：记录样本唯一编号，确保可追溯</li>
+                        <li><strong>样本处理</strong>：按SOP描述处理样本，记录处理方法和条件</li>
+                        <li><strong>试剂配制</strong>：记录试剂配制方法、浓度、体积；标注配制时间</li>
+                        <li><strong>条件控制</strong>：严格控制反应温度和时间，使用计时器</li>
+                        <li><strong>标记保存</strong>：处理后的样本正确标记，按条件保存</li>
+                    </ol>
+                `
+            };
+
+            const step3 = {
+                title: '步骤3: 核心实验操作 — 完整操作手册',
+                content: isWB ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">Western Blot 电泳→转膜→抗体孵育→显影</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>上样</strong>：每孔上样20-40μg蛋白+5μL预染Protein Marker→记录上样顺序</li>
+                        <li><strong>电泳</strong>：80V跑浓缩胶至分离胶界面(约30min)→120V跑分离胶至染料到底(约60-90min)</li>
+                        <li><strong>转膜(湿转)</strong>：组装三明治(海绵-滤纸-凝胶-PVDF膜-滤纸-海绵，赶气泡)→300mA冰浴转膜90min</li>
+                        <li><strong>封闭</strong>：5%脱脂奶粉/TBST室温摇床封闭1h</li>
+                        <li><strong>一抗孵育</strong>：按推荐稀释比用5%BSA/TBST稀释一抗→4°C摇床过夜(12-16h)</li>
+                        <li><strong>洗涤</strong>：TBST洗涤3次×10min(摇床)</li>
+                        <li><strong>二抗孵育</strong>：HRP标记二抗(1:5000-10000)室温1h</li>
+                        <li><strong>洗涤</strong>：TBST洗涤3次×10min</li>
+                        <li><strong>显影</strong>：ECL底物均匀覆盖膜→化学发光成像系统曝光(多时间梯度:1s/10s/30s/1min/5min)</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 转膜时必须冰浴降温(防止过热)；磷酸化蛋白用BSA封闭(牛奶含磷酸化蛋白)；ECL底物现配现用；保存原始图像(TIF，未裁剪)
+                    </div>
+                ` : isPCR ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">qPCR 运行与数据分析</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>运行监控</strong>：观察扩增曲线是否正常(基线平稳→指数期→平台期)；异常孔(无扩增或提前扩增)标记</li>
+                        <li><strong>熔解曲线检查</strong>：确认每个样品熔解曲线为单峰(引物特异)；多峰提示引物二聚体或非特异扩增</li>
+                        <li><strong>数据导出</strong>：导出原始Ct值文件(.csv/.xls)；保存扩增曲线和熔解曲线图</li>
+                        <li><strong>数据分析</strong>：ΔCt=Ct(靶基因)-Ct(内参) → ΔΔCt=ΔCt(实验组)-ΔCt(对照组) → 相对表达=2^(-ΔΔCt)</li>
+                        <li><strong>统计检验</strong>：GraphPad Prism进行t检验(两组)或ANOVA(多组)，P<0.05为显著</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 技术重复Ct差异应<0.5；NTC的Ct应>35或Undetermined；内参Ct在不同样品间变异<0.5
+                    </div>
+                ` : isCell ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">细胞处理与检测操作</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>细胞处理</strong>：按实验方案加入药物/刺激因子→记录浓度和处理时间→设溶剂对照</li>
+                        <li><strong>孵育</strong>：37°C/5%CO2培养指定时间→定期显微镜观察细胞状态变化</li>
+                        <li><strong>检测操作</strong>：根据实验类型执行检测(CCK-8加试剂/EdU固定染色/流式收集细胞等)</li>
+                        <li><strong>拍照记录</strong>：显微镜拍照记录细胞状态(固定位置、相同倍率、相同曝光)</li>
+                        <li><strong>数据采集</strong>：酶标仪读板/流式上机/荧光显微镜成像→导出原始数据</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 药物浓度需预实验确定IC50；设至少3个复孔；边缘孔加PBS防蒸发；CCK-8孵育时间需优化
+                    </div>
+                ` : isAnimal ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">动物操作与监测</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>动物固定</strong>：正确固定动物(抓取颈背部皮肤→尾巴固定)→确认固定牢固</li>
+                        <li><strong>给药操作</strong>：按方案给药(灌胃/注射等)→记录给药时间、剂量、途径→观察动物反应</li>
+                        <li><strong>术后护理</strong>：手术操作后保温复苏→镇痛处理(布比卡因)→单笼饲养观察至恢复</li>
+                        <li><strong>监测记录</strong>：按方案频率测量/观察→记录体重、肿瘤体积、行为学等数据</li>
+                        <li><strong>终点处理</strong>：到达终点后CO₂安乐死→解剖取材→组织固定/冻存</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 灌胃针从小鼠右侧嘴角进入沿上颎滑入食道；注射避免渗漏；每周至少称重2次；严格遵循伦理终点标准
+                    </div>
+                ` : `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">核心实验操作</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li>按SOP执行核心实验操作步骤</li>
+                        <li>记录关键参数(温度/时间/转速/电压等)</li>
+                        <li>观察并记录实验现象</li>
+                        <li>如有异常立即记录并评估是否继续</li>
+                        <li>拍照/录像记录关键操作步骤</li>
+                    </ol>
+                `
+            };
+
+            const step4 = {
+                title: '步骤4: 质量控制 — 完整操作手册',
+                content: `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">实验质控检查清单</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>阳性对照</strong>：确认阳性对照结果正确(如WB内参条带清晰、qPCR标准曲线R²>0.99)→如异常需排查原因</li>
+                        <li><strong>阴性对照</strong>：确认阴性对照无信号(如WB二抗对照无条带、qPCR NTC无扩增)→如有信号提示污染</li>
+                        <li><strong>重复性检查</strong>：技术重复间CV<15%(CCK-8/ELISA)或CV<5%(qPCR)→变异过大需重做</li>
+                        <li><strong>SOP偏离评估</strong>：如有偏离SOP的操作→记录偏离内容→评估对结果的影响</li>
+                        <li><strong>异常记录</strong>：详细描述异常现象(时间、表现、可能原因)→拍照记录→决定是否继续或终止</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 对照不合格必须重做，数据不可用；异常情况需在实验记录中详细说明，由负责人判断是否接受
+                    </div>
+                `
+            };
+
+            const step5 = {
+                title: '步骤5: 结果记录 — 完整操作手册',
+                content: `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">结果记录与数据保存</h4>
+                    <ol style="padding-left:20px;line-height:2;">
+                        <li><strong>原始数据保存</strong>：保存原始数据文件(未处理、未裁剪)；仪器导出原始文件(.fcs/.csv/.tif)；命名规范(日期_实验编号_样品)</li>
+                        <li><strong>结果图片</strong>：拍照/录像记录实验结果→包含标尺/比例尺→标注样品信息→保存高分辨率版本(≥300dpi)</li>
+                        <li><strong>初步结论</strong>：客观描述实验结果→与预期结果比较(一致/部分一致/不一致)→分析可能原因</li>
+                        <li><strong>数据备份</strong>：重要数据至少备份2份(电脑+移动硬盘/云盘)→检查备份完整性</li>
+                        <li><strong>下一步规划</strong>：根据本次结果决定下一步实验→如失败需分析原因并调整方案</li>
+                    </ol>
+                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
+                        💡 原始数据是科研的基石，切勿只保存处理后的图片！阴性结果同样有记录价值。所有数据按日期和项目归档。
+                    </div>
+                `
+            };
+
+            return {1: step1, 2: step2, 3: step3, 4: step4, 5: step5};
         }
 
         function closeModal() {
@@ -3343,7 +3469,7 @@
                         <div class="card-body" style="font-size: 0.85rem;">
                             <p>SOP核对: ${stepData.step1.sopVerified === 'yes' ? '✅' : '❌'}</p>
                             ${stepData.step1.sampleCheck ? `<p>样本核对: ${stepData.step1.sampleCheck}</p>` : ''}
-                            ${stepData.step1.reagentBatch ? `<p>试剂批号: ${stepData.step1.reagentBatch}</p>` : ''}
+                            
                             ${stepData.step1.files?.length ? `<p>📷 已上传 ${stepData.step1.files.length} 个文件</p>` : '⚠️ 无影像记录'}
                         </div>
                     </div>
