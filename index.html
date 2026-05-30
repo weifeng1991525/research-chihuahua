@@ -3449,74 +3449,382 @@
         }
 
         function getCompleteManuals(expType) {
-            const isWB = expType.includes('western') || expType.includes('wb');
-            const isPCR = expType.includes('pcr') || expType.includes('qpcr');
-            const isCell = expType.includes('cell') || expType.includes('cck') || expType.includes('edu') || expType.includes('apoptosis') || expType.includes('cycle') || expType.includes('transwell') || expType.includes('wound') || expType.includes('clone');
-            const isAnimal = expType.includes('animal') || expType.includes('xenograft') || expType.includes('tumor') || expType.includes('dosing') || expType.includes('injection') || expType.includes('harvest') || expType.includes('behavior') || expType.includes('survival');
-            const isIHC = expType.includes('ihc') || expType.includes('he') || expType.includes('masson') || expType.includes('stain');
-            const isSeq = expType.includes('seq') || expType.includes('library') || expType.includes('chip');
+            const expTypeLower = (expType || '').toLowerCase();
+            const isWB = expTypeLower.includes('western') || expTypeLower.includes('wb') || expTypeLower.includes('蛋白') || expTypeLower.includes('免疫印迹');
+            const isPCR = expTypeLower.includes('pcr') || expTypeLower.includes('qpcr') || expTypeLower.includes('定量') || expTypeLower.includes('扩增');
+            const isCell = expTypeLower.includes('cell') || expTypeLower.includes('cck') || expTypeLower.includes('edu') || expTypeLower.includes('apoptosis') || expTypeLower.includes('凋亡') || expTypeLower.includes('cycle') || expTypeLower.includes('周期') || expTypeLower.includes('transwell') || expTypeLower.includes('迁移') || expTypeLower.includes('wound') || expTypeLower.includes('划痕') || expTypeLower.includes('clone') || expTypeLower.includes('克隆');
+            const isAnimal = expTypeLower.includes('animal') || expTypeLower.includes('xenograft') || expTypeLower.includes('tumor') || expTypeLower.includes('小鼠') || expTypeLower.includes('大鼠') || expTypeLower.includes('动物') || expTypeLower.includes('灌胃') || expTypeLower.includes('注射');
+            const isIHC = expTypeLower.includes('ihc') || expTypeLower.includes('he') || expTypeLower.includes('masson') || expTypeLower.includes('免疫组化') || expTypeLower.includes('染色');
+            const isFlow = expTypeLower.includes('flow') || expTypeLower.includes('流式') || expTypeLower.includes('annexin');
+            const isSeq = expTypeLower.includes('seq') || expTypeLower.includes('测序') || expTypeLower.includes('library') || expTypeLower.includes('chip');
 
             const step1 = {
                 title: '步骤1: 实验前准备 — 完整操作手册',
                 content: isWB ? `
-                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">Western Blot 实验前准备</h4>
-                    <ol style="padding-left:20px;line-height:2;">
-                        <li><strong>配制RIPA裂解液</strong>：RIPA基础液+蛋白酶抑制剂(cOmplete™ EDTA-free, 1片/50mL)+磷酸酶抑制剂(Na₃VO₄ 1mM, NaF 50mM)，冰上预冷</li>
-                        <li><strong>准备电泳相关</strong>：配制分离胶(8-15%，依蛋白分子量)和浓缩胶(5%)，或使用预制胶；电泳缓冲液(Tris 25mM, Glycine 192mM, SDS 0.1%)</li>
-                        <li><strong>准备转膜相关</strong>：PVDF膜剪裁合适大小→100%甲醇浸泡10-30s激活→转膜缓冲液(Tris 25mM, Glycine 192mM, Methanol 20%)中浸泡</li>
-                        <li><strong>准备抗体</strong>：确认一抗(名称/宿主/稀释比/批号)和HRP二抗在有效期内；封闭液(5%脱脂奶粉/TBST)现配</li>
-                        <li><strong>仪器检查</strong>：电泳槽、转膜槽、摇床、化学发光成像系统均正常；冰浴准备(转膜降温用)</li>
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">Western Blot 实验前准备 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、溶液配制（精确浓度）</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>RIPA裂解液（冰上预冷）</strong>：
+                            <br>• RIPA基础液 1mL + 蛋白酶抑制剂混合物 10μL（或cOmplete™ EDTA-free 1片/50mL）
+                            <br>• 磷酸酶抑制剂：Na₃VO₄ 1mM（加1μL 100mM母液）+ NaF 50mM（加50μL 1M母液）
+                            <br>• PMSF 1mM（临用前加，10μL 100mM母液/mL裂解液）</li>
+                        <li><strong>电泳缓冲液（1×）</strong>：
+                            <br>• Tris 25mM + Glycine 192mM + SDS 0.1%，pH 8.3
+                            <br>• 配制：Tris 3.03g + Glycine 14.4g + SDS 1g，加ddH₂O至1L</li>
+                        <li><strong>转膜缓冲液（湿转，1×）</strong>：
+                            <br>• Tris 25mM + Glycine 192mM + 甲醇 20%
+                            <br>• 配制：Tris 3.03g + Glycine 14.4g + 甲醇 200mL，加ddH₂O至1L
+                            <br>• ⚠️ 蛋白>80kDa时加SDS至终浓度0.1%</li>
+                        <li><strong>TBST洗涤液</strong>：
+                            <br>• TBS：Tris 20mM + NaCl 150mM，pH 7.6
+                            <br>• 加Tween-20至终浓度0.1%</li>
+                        <li><strong>封闭液（现配）</strong>：
+                            <br>• 5%脱脂奶粉：脱脂奶粉5g + TBST 100mL
+                            <br>• 或5%BSA（磷酸化蛋白用）：BSA 5g + TBST 100mL</li>
+                        <li><strong>2×Loading Buffer</strong>：
+                            <br>• SDS 4% + 2-巯基乙醇10%（或DTT 100mM）+ 甘油20% + 溴酚蓝0.004% + Tris-HCl 0.125M pH6.8</li>
                     </ol>
-                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
-                        ⚠️ 关键提醒：①全程冰上操作蛋白提取 ②PVDF膜必须甲醇活化 ③磷酸化蛋白用BSA封闭(不用牛奶) ④ECL底物避光保存
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、材料准备清单</h5>
+                    <ul style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>凝胶</strong>：根据靶蛋白分子量选择分离胶浓度
+                            <br>• 10-40kDa → 15%胶 | 40-100kDa → 10%胶 | 100-200kDa → 8%胶</li>
+                        <li><strong>PVDF膜</strong>：0.45μm（常规）或0.22μm（<20kDa小分子）</li>
+                        <li><strong>抗体确认</strong>：
+                            <br>• 一抗：核对靶标名称、宿主、稀释比（通常1:500-1:2000）、批号、有效期
+                            <br>• 二抗：HRP标记抗兔/鼠IgG，稀释比1:5000-1:10000</li>
+                        <li><strong>蛋白Marker</strong>：预染Marker（上样5μL/孔）</li>
+                        <li><strong>ECL显色液</strong>：A液:B液 = 1:1，现配现用，避光</li>
+                    </ul>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、仪器检查</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li>电泳槽：检查电极是否清洁，确认正负极标识</li>
+                        <li>转膜槽：检查密封性，准备冰浴降温装置</li>
+                        <li>摇床：确认转速可调（封闭/洗膜用50-70rpm）</li>
+                        <li>化学发光成像系统：开机预热，检查CCD状态</li>
+                        <li>准备冰盒：蛋白提取和转膜全程冰上操作</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 全程冰上操作蛋白提取，防止降解
+                        <br>② PVDF膜必须100%甲醇浸泡10-30s活化（从不透明变半透明）
+                        <br>③ 磷酸化蛋白检测必须用BSA封闭（脱脂奶粉含磷酸化酪蛋白）
+                        <br>④ ECL底物避光保存，现配现用，过期失效
+                        <br>⑤ 所有溶液pH需用pH计校准，不要凭经验
                     </div>
                 ` : isPCR ? `
-                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">qPCR 实验前准备</h4>
-                    <ol style="padding-left:20px;line-height:2;">
-                        <li><strong>引物验证</strong>：确认引物Tm 58-62°C，产物80-200bp；琼脂糖凝胶电泳验证单条带；标准曲线验证扩增效率90-110%</li>
-                        <li><strong>cDNA准备</strong>：RNA逆转录产物稀释5-10倍；Nanodrop检测浓度和纯度(A260/280 1.8-2.0)</li>
-                        <li><strong>Master Mix准备</strong>：SYBR Green Master Mix冰上解冻；Nuclease-free Water准备</li>
-                        <li><strong>96孔板设计</strong>：每样品3个技术重复+NTC(无模板对照)+标准曲线(如需)；记录加样布局图</li>
-                        <li><strong>仪器检查</strong>：qPCR仪开机预热；确认荧光通道设置正确；数据保存路径设置</li>
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">qPCR 实验前准备 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、引物验证（必须完成）</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>引物设计参数确认</strong>：
+                            <br>• 产物长度：80-200bp（最佳100-150bp）
+                            <br>• Tm值：58-62°C（上下游引物差值≤2°C）
+                            <br>• GC含量：40-60%
+                            <br>• 3'端避免连续3个G或C</li>
+                        <li><strong>引物特异性验证</strong>：
+                            <br>• NCBI Primer-BLAST检查非特异性结合
+                            <br>• 琼脂糖凝胶电泳验证单一条带（2%胶，120V，30min）</li>
+                        <li><strong>标准曲线验证（关键）</strong>：
+                            <br>• cDNA 5倍梯度稀释（1:1, 1:5, 1:25, 1:125, 1:625）
+                            <br>• 每个梯度3个技术重复
+                            <br>• 要求：斜率 -3.1~-3.6，R²>0.99，扩增效率90-110%</li>
                     </ol>
-                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
-                        ⚠️ 关键提醒：①分区操作(模板制备-反应配制-上机) ②内参基因需验证稳定性 ③NTC必须无扩增 ④技术重复CV<5%
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、模板准备</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>RNA质量检测</strong>：
+                            <br>• Nanodrop：A260/280 = 1.8-2.0，A260/230 > 1.8
+                            <br>• 琼脂糖电泳：28S/18S条带清晰，比例≈2:1
+                            <br>• 或Agilent Bioanalyzer：RIN值 > 7.0</li>
+                        <li><strong>cDNA合成</strong>：
+                            <br>• 使用高效逆转录酶（如HiScript II，RNase H⁻）
+                            <br>• 逆转录引物：oligo(dT)或随机六聚体（或两者混合）
+                            <br>• 反应体积20μL，按试剂盒说明书操作</li>
+                        <li><strong>cDNA稀释</strong>：
+                            <br>• 原液稀释5-10倍后使用
+                            <br>• 分装保存于-20°C，避免反复冻融（>3次）</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、试剂准备</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>SYBR Green Master Mix</strong>：
+                            <br>• 冰上解冻，轻柔混匀，避免剧烈震荡产生气泡
+                            <br>• 常用品牌：TB Green Premix Ex Taq II、PowerUp SYBR Green等</li>
+                        <li><strong>ROX参比染料（如需要）</strong>：
+                            <br>• ABI仪器通常需要ROX校正（High/Low ROX根据机型选择）</li>
+                        <li><strong>Nuclease-free Water</strong>：
+                            <br>• 确认无RNase和DNase污染
+                            <br>• 分装使用，避免交叉污染</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">四、96孔板布局设计</h5>
+                    <ul style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>每个样品</strong>：3个技术重复（同一cDNA加3个孔）</li>
+                        <li><strong>NTC（无模板对照）</strong>：每个引物对至少1个，加Water代替cDNA</li>
+                        <li><strong>内参基因</strong>：每个样品同时检测（GAPDH/β-actin/18S）</li>
+                        <li><strong>标准曲线（可选）</strong>：5点梯度稀释，用于绝对定量</li>
+                        <li><strong>边缘效应处理</strong>：外围孔加50μL矿物油或不用</li>
+                    </ul>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 分区操作：模板制备区→反应配制区→上机区，防止交叉污染
+                        <br>② 内参基因必须验证稳定性（geNorm或BestKeeper分析）
+                        <br>③ NTC必须无扩增（Ct>35或Undetermined），否则提示污染
+                        <br>④ 技术重复间Ct值差异应<0.5，CV<5%
+                        <br>⑤ 引物验证不合格不得进行正式实验
                     </div>
                 ` : isCell ? `
-                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">细胞实验前准备</h4>
-                    <ol style="padding-left:20px;line-height:2;">
-                        <li><strong>细胞状态检查</strong>：倒置显微镜100×观察细胞形态、密度、有无污染(浑浊/漂浮颗粒/黑点)</li>
-                        <li><strong>培养基准备</strong>：完全培养基预热至37°C；确认血清批号一致</li>
-                        <li><strong>试剂准备</strong>：胰酶(0.25% EDTA，37°C预热)；PBS(预热)；药物/处理试剂按方案配制</li>
-                        <li><strong>耗材准备</strong>：培养皿/板、移液器枪头(灭菌)、离心管、计数板或自动计数仪</li>
-                        <li><strong>CO2培养箱检查</strong>：温度37°C、CO2浓度5%、湿度正常；水盘有水</li>
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">细胞实验前准备 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、细胞状态评估</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>显微镜检查（100×倒置显微镜）</strong>：
+                            <br>• 形态：细胞形态正常，无变圆、皱缩或破裂
+                            <br>• 密度：汇合度60-80%（传代/实验最佳密度）
+                            <br>• 污染检查：培养基澄清，无浑浊、漂浮颗粒、黑点或丝状物
+                            <br>• 背景：背景干净，无异常折射光点</li>
+                        <li><strong>细胞活力预检（可选）</strong>：
+                            <br>• 台盼蓝染色：取10μL细胞悬液+10μL 0.4%台盼蓝，3min内计数
+                            <br>• 活力应>95%（蓝色细胞<5%）</li>
                     </ol>
-                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
-                        ⚠️ 关键提醒：①细胞汇合度60-80%时操作最佳 ②定期检测支原体 ③对数期细胞活力最好 ④无菌操作全程在生物安全柜内
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、试剂预热与配制</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>完全培养基</strong>：37°C水浴预热20-30min
+                            <br>• 基础培养基 + 10% FBS + 1%双抗（青霉素100U/mL + 链霉素100μg/mL）</li>
+                        <li><strong>PBS（无Ca²⁺/Mg²⁺）</strong>：37°C预热，用于洗涤</li>
+                        <li><strong>胰酶-EDTA（0.25%）</strong>：37°C预热，用于贴壁细胞消化
+                            <br>• 或Accutase（温和消化，干细胞推荐）</li>
+                        <li><strong>药物/处理试剂</strong>：
+                            <br>• 按实验方案配制母液（通常1000×）
+                            <br>• DMSO溶解的药物：终浓度DMSO≤0.1%（设溶剂对照）</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、耗材与设备检查</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>培养皿/板</strong>：
+                            <br>• 根据实验选择：6孔板（2mL/孔）、12孔板（1mL/孔）、24孔板（0.5mL/孔）、96孔板（100μL/孔）</li>
+                        <li><strong>移液器与枪头</strong>：灭菌，确认量程准确</li>
+                        <li><strong>细胞计数板/自动计数仪</strong>：清洁，校准</li>
+                        <li><strong>离心机</strong>：预冷至4°C（如需）</li>
+                        <li><strong>CO₂培养箱</strong>：
+                            <br>• 温度37.0±0.5°C，CO₂浓度5.0±0.2%，湿度>95%
+                            <br>• 水盘水位正常，确认CO₂钢瓶余量</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">四、实验设计确认</h5>
+                    <ul style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>分组</strong>：对照组、溶剂对照组、实验组（浓度梯度或时间点）</li>
+                        <li><strong>复孔设置</strong>：每组至少3个生物学重复，每个重复3个技术复孔</li>
+                        <li><strong>细胞数</strong>：96孔板5×10³/孔，24孔板1×10⁵/孔，6孔板2×10⁵/孔（需预实验优化）</li>
+                        <li><strong>边缘孔处理</strong>：96孔板外围孔加PBS，防止边缘效应</li>
+                    </ul>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 细胞汇合度60-80%时操作最佳，过密或过稀影响结果
+                        <br>② 定期检测支原体（每3个月），污染细胞数据不可靠
+                        <br>③ 对数期细胞（传代后24-48h）活力最好，避免使用老化细胞
+                        <br>④ 无菌操作全程在生物安全柜内，提前紫外消毒30min
+                        <br>⑤ 同一实验使用同一批号血清和培养基，减少批次效应
                     </div>
                 ` : isAnimal ? `
-                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">动物实验前准备</h4>
-                    <ol style="padding-left:20px;line-height:2;">
-                        <li><strong>伦理确认</strong>：IACUC方案在有效期内；明确伦理终点(肿瘤≤1500mm³或直径≤1.5cm；体重下降>20%)</li>
-                        <li><strong>动物检查</strong>：称重记录；检查精神状态、活动、进食、饮水、皮毛、排泄是否正常</li>
-                        <li><strong>给药准备</strong>：按体重计算给药剂量(体积:小鼠i.g. 10mL/kg, i.p. 5-10mL/kg)；药物现配</li>
-                        <li><strong>器械准备</strong>：灌胃针/注射器(型号正确)；麻醉剂(如需)；镇痛药(术后)；卡尺(测肿瘤)</li>
-                        <li><strong>分组方案</strong>：随机数字表法分组；各组间体重差异<10%；记录分组编号</li>
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">动物实验前准备 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、伦理与法规确认</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>IACUC审批</strong>：确认伦理方案在有效期内，实验内容不超范围</li>
+                        <li><strong>伦理终点明确</strong>：
+                            <br>• 肿瘤体积≤1500mm³或直径≤1.5cm
+                            <br>• 体重下降≤20%（连续3天）
+                            <br>• 体温过低、无法进食、严重感染、肿瘤溃烂等立即安乐死</li>
+                        <li><strong>3R原则确认</strong>：替代（Replacement）、减少（Reduction）、优化（Refinement）</li>
                     </ol>
-                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
-                        ⚠️ 关键提醒：①3R原则(替代/减少/优化) ②随机分组+盲法评估 ③术后必须镇痛 ④每日观察动物福利 ⑤到达伦理终点必须人道处理
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、动物健康检查</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>外观检查</strong>：
+                            <br>• 精神状态：活泼、反应灵敏
+                            <br>• 皮毛：光滑平整，无脱毛、溃疡或创伤
+                            <br>• 眼睛：明亮清澈，无分泌物
+                            <br>• 呼吸：平稳，无喘息或杂音</li>
+                        <li><strong>行为观察</strong>：
+                            <br>• 活动正常，无跛行或异常姿势
+                            <br>• 进食饮水正常
+                            <br>• 排泄正常，粪便成形，无腹泻或血尿</li>
+                        <li><strong>称重记录</strong>：
+                            <br>• 使用精密电子天平（精度0.1g）
+                            <br>• 记录每只动物体重，计算给药剂量</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、给药方案计算</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>剂量计算</strong>：
+                            <br>• 给药体积 = 体重(g) × 剂量(mg/kg) ÷ 药物浓度(mg/mL)
+                            <br>• 示例：20g小鼠，剂量10mg/kg，药物浓度5mg/mL
+                            <br>• 计算：0.02kg × 10mg/kg ÷ 5mg/mL = 0.04mL = 40μL</li>
+                        <li><strong>最大给药体积（小鼠）</strong>：
+                            <br>• 灌胃(i.g.)：10mL/kg（200μL/20g小鼠）
+                            <br>• 腹腔注射(i.p.)：5-10mL/kg（100-200μL/20g小鼠）
+                            <br>• 皮下注射(s.c.)：10mL/kg
+                            <br>• 尾静脉注射(i.v.)：0.5-2.5mL/kg（快速vs慢速）</li>
+                        <li><strong>药物配制</strong>：
+                            <br>• 现配现用，或分装-20°C保存（避免反复冻融>3次）
+                            <br>• 溶媒选择：生理盐水、PBS、含0.5% CMC-Na的生理盐水（混悬液）</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">四、器械与耗材准备</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>灌胃针</strong>：小鼠用20-22G，球端弯曲，长度3-4cm</li>
+                        <li><strong>注射器与针头</strong>：
+                            <br>• 腹腔注射：1mL注射器 + 25-27G针头（5/8-1英寸）
+                            <br>• 皮下注射：1mL注射器 + 25-27G针头
+                            <br>• 尾静脉：1mL注射器 + 25-30G针头（1/2-5/8英寸）</li>
+                        <li><strong>麻醉与镇痛</strong>：
+                            <br>• 麻醉：异氟烷吸入麻醉或戊巴比妥钠(50-60mg/kg, i.p.)
+                            <br>• 术后镇痛：布比卡因局部浸润或丁丙诺啡(0.05-0.1mg/kg, s.c.)</li>
+                        <li><strong>测量工具</strong>：游标卡尺（测肿瘤体积）、电子天平</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">五、分组与标记</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>随机分组</strong>：使用随机数字表或软件（GraphPad Rand函数）</li>
+                        <li><strong>体重均衡</strong>：各组间平均体重差异<10%</li>
+                        <li><strong>动物标记</strong>：
+                            <br>• 耳标法：耳标钳打耳标
+                            <br>• 染色法：苦味酸/品红染毛（标记编号）
+                            <br>• 尾标法：尾巴条纹标记</li>
+                        <li><strong>盲法</strong>：操作者和评估者不知分组情况（减少偏倚）</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 3R原则必须遵守，实验设计需经IACUC批准
+                        <br>② 随机分组+盲法评估是减少偏倚的关键
+                        <br>③ 术后必须镇痛，不可省略
+                        <br>④ 每日观察动物福利，到达伦理终点必须立即人道处理
+                        <br>⑤ 详细记录每只动物的体重、给药、观察结果
                     </div>
                 ` : isIHC ? `
-                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">病理染色实验前准备</h4>
-                    <ol style="padding-left:20px;line-height:2;">
-                        <li><strong>切片准备</strong>：石蜡切片3-5μm；60°C烤箱烤片1-2h防脱片；或冰冻切片OCT包埋-80°C保存</li>
-                        <li><strong>抗原修复液</strong>：柠檬酸钠pH6.0(微波)或EDTA pH9.0(高压)；预热微波炉/高压锅</li>
-                        <li><strong>抗体准备</strong>：确认一抗克隆号、稀释比、修复方式；HRP二抗准备；DAB显色试剂盒现配</li>
-                        <li><strong>对照设置</strong>：阳性对照(已知阳性组织)；阴性对照(PBS替代一抗)</li>
-                        <li><strong>其他试剂</strong>：3%H₂O₂(淬灭内源酶)；5%BSA(封闭)；苏木素(复染)；梯度乙醇+二甲苯</li>
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">免疫组化(IHC)实验前准备 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、切片准备</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>石蜡切片</strong>：
+                            <br>• 切片厚度：3-5μm（常规4μm）
+                            <br>• 烤片：60-65°C烤箱，1-2小时（防脱片）
+                            <br>• 或37°C过夜</li>
+                        <li><strong>冰冻切片（如需要）</strong>：
+                            <br>• OCT包埋，-80°C保存
+                            <br>• 切片前-20°C预冷10min
+                            <br>• 切片厚度：6-10μm</li>
+                        <li><strong>防脱片处理</strong>：
+                            <br>• APES（3-氨丙基三乙氧基硅烷）处理玻片
+                            <br>• 或购买预涂防脱片玻片（如Superfrost Plus）</li>
                     </ol>
-                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
-                        ⚠️ 关键提醒：①阳性对照和阴性对照必须同时做 ②DAB显色时间需优化(显微镜下监控) ③切片全程保持湿润
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、溶液配制</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>PBS（0.01M，pH7.2-7.4）</strong>：
+                            <br>• NaCl 8g + KCl 0.2g + Na₂HPO₄·12H₂O 3.58g + KH₂PO₄ 0.24g，加ddH₂O至1L</li>
+                        <li><strong>PBST</strong>：PBS + Tween-20 0.1%</li>
+                        <li><strong>抗原修复液</strong>：
+                            <br>• 柠檬酸钠缓冲液(pH6.0)：柠檬酸钠0.01M
+                            <br>• 或EDTA缓冲液(pH9.0)：EDTA 1mM, Tris 10mM
+                            <br>• 或Tris-EDTA(pH9.0)：10mM Tris, 1mM EDTA</li>
+                        <li><strong>3% H₂O₂甲醇溶液</strong>：30% H₂O₂ 10mL + 甲醇90mL（现配，避光）</li>
+                        <li><strong>封闭液</strong>：
+                            <br>• 5% BSA：BSA 5g + PBS 100mL
+                            <br>• 或10%正常山羊血清（与二抗同源）</li>
+                        <li><strong>苏木素染液</strong>：按说明书使用，通常稀释1-5倍</li>
+                        <li><strong>盐酸乙醇分化液</strong>：浓盐酸1mL + 无水乙醇99mL</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、抗体准备</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>一抗确认</strong>：
+                            <br>• 克隆号、宿主、适用物种、稀释比
+                            <br>• 修复方式：热修复pH6.0/pH9.0，或酶修复
+                            <br>• 阳性对照组织</li>
+                        <li><strong>二抗准备</strong>：
+                            <br>• HRP标记抗兔/鼠/羊IgG（根据一抗宿主选择）
+                            <br>• 聚合物二抗（增强信号，无需ABC试剂盒）</li>
+                        <li><strong>DAB显色液</strong>：
+                            <br>• DAB底物液:DAB色原:H₂O₂ = 1000:50:1（或按试剂盒说明）
+                            <br>• 现配现用，避光</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">四、对照设置</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>阳性对照</strong>：已知阳性组织切片</li>
+                        <li><strong>阴性对照</strong>：
+                            <br>• 空白对照：PBS代替一抗
+                            <br>• 同型对照：同种属同型IgG代替一抗</li>
+                        <li><strong>内源性对照</strong>：组织内已知阳性结构</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 阳性对照和阴性对照必须同时做，验证体系有效性
+                        <br>② DAB显色时间需优化（显微镜下监控），通常3-10min
+                        <br>③ 切片全程保持湿润，干燥会导致非特异性染色
+                        <br>④ 不同批次抗体需重新优化稀释比
+                        <br>⑤ 抗原修复条件需根据抗体和组织类型优化
+                    </div>
+                ` : isFlow ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">流式细胞术(Annexin V/PI)前准备 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、试剂准备</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>1×Binding Buffer配制</strong>：
+                            <br>• 10×Binding Buffer 1mL + 去离子水9mL
+                            <br>• 成分：10mM HEPES pH7.4, 140mM NaCl, 2.5mM CaCl₂
+                            <br>• 4°C保存，现配现用</li>
+                        <li><strong>Annexin V荧光标记抗体</strong>：
+                            <br>• FITC、PE、APC或Alexa Fluor 488标记
+                            <br>• 2-8°C避光保存，禁止冷冻</li>
+                        <li><strong>PI染色液（50μg/mL）</strong>：
+                            <br>• PI母液1mg/mL，取5μL + 1×Binding Buffer 95μL
+                            <br>• 或直接使用试剂盒提供的PI</li>
+                        <li><strong>7-AAD（可选，替代PI）</strong>：
+                            <br>• 与PE通道兼容，避免FITC/PE光谱重叠</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、细胞准备</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>细胞密度调整</strong>：
+                            <br>• 1-5×10⁵细胞/管（100μL体积）
+                            <br>• 细胞密度过高会导致染色不充分</li>
+                        <li><strong>贴壁细胞收集</strong>：
+                            <br>• 收集培养上清中的漂浮细胞（凋亡细胞可能脱落）
+                            <br>• 贴壁细胞用无EDTA胰酶或Accutase消化
+                            <br>• PBS洗涤，避免EDTA影响Annexin V结合</li>
+                        <li><strong>悬浮细胞</strong>：直接收集，300×g离心5min</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、流式细胞仪设置</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>对照管设置</strong>：
+                            <br>• 未染色对照：调电压，设阴性群体
+                            <br>• Annexin V单染：FITC/PE/APC补偿
+                            <br>• PI单染：PI/7-AAD补偿</li>
+                        <li><strong>通道选择</strong>：
+                            <br>• Annexin V-FITC：FITC通道（488nm激发，530/30nm收集）
+                            <br>• PI：PE-Texas Red或PerCP-Cy5.5通道（避免FITC溢出）</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 全程避光操作，荧光物质易淬灭
+                        <br>② 染色后1小时内上机检测，延迟会导致假阳性
+                        <br>③ 避免使用含EDTA的胰酶，EDTA会螯合Ca²⁺影响Annexin V结合
+                        <br>④ 细胞密度控制在1-5×10⁵/管，过密染色不充分
+                        <br>⑤ 必须设单染管做补偿调节
                     </div>
                 ` : `
                     <h4 style="color:var(--primary-blue);margin-bottom:8px;">实验前准备 — 通用操作手册</h4>
@@ -3533,28 +3841,245 @@
             const step2 = {
                 title: '步骤2: 样本与试剂处理 — 完整操作手册',
                 content: isWB ? `
-                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">蛋白提取与定量</h4>
-                    <ol style="padding-left:20px;line-height:2;">
-                        <li><strong>细胞裂解</strong>：弃培养基→预冷PBS洗涤2次→加RIPA裂解液(6cm皿加200μL，10cm皿加500μL)→冰上放置30min(每10min涡旋10s)</li>
-                        <li><strong>离心收集</strong>：14000g 4°C离心15min→小心吸取上清至新管(避开脂质层)→弃沉淀</li>
-                        <li><strong>BCA定量</strong>：BSA标准曲线(0/250/500/1000/1500/2000μg/mL)→取2μL样品+200μL BCA工作液→37°C 30min→562nm检测</li>
-                        <li><strong>浓度调整</strong>：用裂解液将所有样品调整至同一浓度(如2μg/μL)→计算上样体积(20-40μg蛋白)</li>
-                        <li><strong>样品变性</strong>：蛋白样品+5×Loading Buffer(4:1)→95°C金属浴5min→短暂离心→冰上备用</li>
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">Western Blot 蛋白提取与定量 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、蛋白提取（全程冰上操作）</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>洗涤细胞</strong>：
+                            <br>• 弃去培养基，预冷PBS轻柔洗涤细胞2次
+                            <br>• 6cm皿加200μL RIPA，10cm皿加500μL，T25瓶加300-500μL
+                            <br>• 冰上裂解30min，每10min涡旋震荡10s</li>
+                        <li><strong>超声破碎（可选，核蛋白/膜蛋白需要）</strong>：
+                            <br>• 功率30-40%，超声10-15s，间隔15s，共3次
+                            <br>• 或20G-18G-16G针头冰上反复抽吸至澄清</li>
+                        <li><strong>离心澄清</strong>：
+                            <br>• 4°C，12000-14000×g，离心15-20min
+                            <br>• 小心吸取上清至新管（避开脂质层和沉淀）
+                            <br>• 沉淀弃去</li>
+                        <li><strong>分装保存</strong>：
+                            <br>• 按50-100μL分装，避免反复冻融
+                            <br>• -80°C保存（短期-20°C，<1周）</li>
                     </ol>
-                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
-                        💡 蛋白定量标准曲线R²应>0.99；样品浓度应在标准曲线线性范围内；若浓度过高需稀释后重新定量
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、BCA蛋白定量（精确步骤）</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>BSA标准曲线配制</strong>：
+                            <br>• 浓度梯度：0, 250, 500, 1000, 1500, 2000 μg/mL
+                            <br>• 用裂解液稀释BSA母液（2mg/mL）</li>
+                        <li><strong>样品稀释</strong>：
+                            <br>• 估计蛋白浓度，用裂解液稀释至标准曲线范围内
+                            <br>• 通常稀释10-50倍</li>
+                        <li><strong>加样（96孔板）</strong>：
+                            <br>• 每孔加标准品或样品2μL（或按试剂盒说明）
+                            <br>• 加BCA工作液200μL（A液:B液=50:1，现配）</li>
+                        <li><strong>孵育与检测</strong>：
+                            <br>• 37°C孵育30min（或室温2h）
+                            <br>• 酶标仪562nm读数
+                            <br>• 标准曲线R²必须>0.99</li>
+                        <li><strong>浓度计算</strong>：
+                            <br>• 根据标准曲线计算样品浓度
+                            <br>• 所有样品调整至同一浓度（如2μg/μL）</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、样品变性处理</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>蛋白样品</strong>：取含20-40μg蛋白的体积</li>
+                        <li><strong>加Loading Buffer</strong>：
+                            <br>• 样品:5×Loading Buffer = 4:1
+                            <br>• 如16μL样品 + 4μL 5×Loading Buffer</li>
+                        <li><strong>变性</strong>：
+                            <br>• 95-100°C金属浴或沸水浴5min
+                            <br>• 短暂离心收集管壁液体
+                            <br>• 冰上冷却备用（或-20°C保存）</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 全程冰上操作，防止蛋白降解
+                        <br>② 标准曲线R²>0.99，样品浓度在线性范围内
+                        <br>③ 所有样品最终浓度必须一致，确保上样量准确
+                        <br>④ 变性后若出现沉淀，说明蛋白浓度过高，需稀释重测
                     </div>
                 ` : isPCR ? `
-                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">qPCR反应体系配制</h4>
-                    <ol style="padding-left:20px;line-height:2;">
-                        <li><strong>体系配制(20μL)</strong>：2×SYBR Green Master Mix 10μL + 正向引物(10μM) 0.4μL + 反向引物(10μM) 0.4μL + cDNA 2μL + Nuclease-free Water 7.2μL</li>
-                        <li><strong>加样</strong>：按96孔板布局图加入对应孔中→每样品3个技术重复→NTC加水替代cDNA</li>
-                        <li><strong>封膜</strong>：光学封膜覆盖→离心500rpm 1min去除气泡→确认无气泡</li>
-                        <li><strong>上机</strong>：放入qPCR仪→选择对应程序文件→确认荧光采集通道</li>
-                        <li><strong>PCR程序</strong>：预变性95°C 30s → (变性95°C 5s → 退火/延伸60°C 30s采集荧光)×40循环 → 熔解曲线65°C→95°C</li>
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">qPCR反应体系配制与上机 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、反应体系配制（20μL体系）</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>Master Mix配制（冰上操作）</strong>：
+                            <br>• 按样品数+2（损耗）计算总量
+                            <br>• 2×SYBR Green Master Mix：10μL/反应
+                            <br>• 正向引物(10μM)：0.4μL/反应（终浓度200nM）
+                            <br>• 反向引物(10μM)：0.4μL/反应（终浓度200nM）
+                            <br>• ROX(如需要)：0.4μL/反应（根据仪器选择High或Low）
+                            <br>• Nuclease-free Water：7.2μL/反应（补足体积）</li>
+                        <li><strong>混匀与分装</strong>：
+                            <br>• 轻柔吹打混匀，避免剧烈震荡产生气泡
+                            <br>• 每孔分装18μL Master Mix</li>
+                        <li><strong>加模板</strong>：
+                            <br>• 每孔加cDNA 2μL（稀释5-10倍后的模板）
+                            <br>• NTC孔加2μL Nuclease-free Water代替cDNA</li>
                     </ol>
-                    <div style="background:#fef3c7;padding:8px;border-radius:6px;margin-top:8px;font-size:0.8rem;">
-                        💡 加样在冰上操作；先配Master Mix混合液再分装(减少孔间差异)；避免产生气泡(影响荧光检测)
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、封膜与离心</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>光学封膜</strong>：
+                            <br>• 撕去封膜底纸，对准96孔板
+                            <br>• 用刮板从中间向四周压实，确保密封
+                            <br>• 避免气泡和缝隙</li>
+                        <li><strong>短暂离心</strong>：
+                            <br>• 500-1000rpm，1min
+                            <br>• 去除气泡，收集管壁液体</li>
+                        <li><strong>检查</strong>：确认每孔液体在孔底，无气泡</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、PCR程序设置</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>标准程序（SYBR Green）</strong>：
+                            <br>• 预变性：95°C，30s（或3min，根据酶要求）
+                            <br>• 循环（40个）：
+                            <br>  - 变性：95°C，5-10s
+                            <br>  - 退火/延伸：60°C，30-34s（荧光采集）
+                            <br>• 熔解曲线：65°C→95°C，每步0.5°C，5s/步</li>
+                        <li><strong>荧光通道</strong>：
+                            <br>• SYBR Green：FAM/SYBR通道
+                            <br>• ROX：ROX通道（参比染料）</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 全程冰上操作，防止模板降解
+                        <br>② 先配Master Mix再分装，减少孔间差异
+                        <br>③ 封膜必须严密，防止蒸发（边缘孔尤其注意）
+                        <br>④ 引物终浓度通常200nM，可优化范围100-400nM
+                        <br>⑤ 熔解曲线必须单峰，多峰提示非特异性扩增
+                    </div>
+                ` : isCell ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">细胞样本处理 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、细胞铺板（以96孔板CCK-8为例）</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>细胞消化</strong>：
+                            <br>• 弃旧培养基，PBS洗涤1次
+                            <br>• 加0.25%胰酶-EDTA（6孔板500μL，T25瓶1mL）
+                            <br>• 37°C孵育1-3min，显微镜下观察细胞变圆</li>
+                        <li><strong>终止与收集</strong>：
+                            <br>• 加2倍体积完全培养基终止消化
+                            <br>• 轻柔吹打，收集细胞悬液</li>
+                        <li><strong>计数</strong>：
+                            <br>• 台盼蓝染色计数或自动计数仪
+                            <br>• 调整浓度至5×10⁴细胞/mL（96孔板每孔100μL，即5×10³/孔）</li>
+                        <li><strong>铺板</strong>：
+                            <br>• 边缘孔加PBS（防蒸发）
+                            <br>• 中间孔加细胞悬液，每孔100μL
+                            <br>• 轻轻晃动混匀，避免气泡</li>
+                        <li><strong>培养贴壁</strong>：
+                            <br>• 37°C，5%CO₂培养过夜（贴壁细胞）</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、药物处理</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>药物配制</strong>：
+                            <br>• 母液通常1000×，DMSO溶解
+                            <br>• 工作液用培养基稀释，现配现用</li>
+                        <li><strong>加药</strong>：
+                            <br>• 设溶剂对照组（DMSO终浓度≤0.1%）
+                            <br>• 浓度梯度组（如0.1, 1, 10, 100μM）
+                            <br>• 每浓度3-6个复孔</li>
+                        <li><strong>处理时间</strong>：
+                            <br>• 根据实验目的：24h, 48h, 72h等
+                            <br>• 记录加药时间</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、CCK-8检测步骤</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>加CCK-8</strong>：
+                            <br>• 每孔加10μL CCK-8溶液（培养基体积的10%）
+                            <br>• 避免气泡产生</li>
+                        <li><strong>孵育</strong>：
+                            <br>• 37°C，5%CO₂孵育1-4h
+                            <br>• 预实验确定最佳时间（OD450 0.8-1.2）</li>
+                        <li><strong>检测</strong>：
+                            <br>• 酶标仪450nm读数
+                            <br>• 参考波长630nm（扣除背景）</li>
+                        <li><strong>计算</strong>：
+                            <br>• 细胞活力(%) = (实验组OD - 空白OD) / (对照组OD - 空白OD) × 100%</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 铺板时细胞悬液必须充分混匀，防止沉降导致不均匀
+                        <br>② 边缘孔加PBS防止蒸发，数据不用
+                        <br>③ 药物有颜色时需设"药物+CCK-8+无细胞"对照扣除背景
+                        <br>④ CCK-8孵育时间需优化，颜色过深会饱和
+                        <br>⑤ 同一实验使用同一批次CCK-8试剂
+                    </div>
+                ` : isAnimal ? `
+                    <h4 style="color:var(--primary-blue);margin-bottom:8px;">动物给药操作 — 可复现详细步骤</h4>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">一、灌胃给药(i.g.)</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>固定小鼠</strong>：
+                            <br>• 左手固定，拇指和食指捏住颈背部皮肤
+                            <br>• 小指和无名指固定尾部
+                            <br>• 使小鼠身体拉长，头颈部呈直线</li>
+                        <li><strong>灌胃针插入</strong>：
+                            <br>• 灌胃针从小鼠右侧嘴角进入
+                            <br>• 沿上颚向后滑入食道（不要强行插入）
+                            <br>• 插入深度：小鼠3-4cm（从口角到最后一肋骨）</li>
+                        <li><strong>确认位置</strong>：
+                            <br>• 感到轻微阻力时停止（到达膈肌）
+                            <br>• 如遇到阻力或动物挣扎，立即退出重插</li>
+                        <li><strong>推注药物</strong>：
+                            <br>• 缓慢推注，观察动物呼吸
+                            <br>• 如动物呛咳，立即停止（可能误入气管）</li>
+                        <li><strong>拔针</strong>：
+                            <br>• 缓慢拔出灌胃针
+                            <br>• 观察动物状态，记录给药时间</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">二、腹腔注射(i.p.)</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>固定小鼠</strong>：
+                            <br>• 头低尾高位（防止刺入肝脏）
+                            <br>• 左手拇指和食指捏住颈背部，腹部暴露</li>
+                        <li><strong>进针</strong>：
+                            <br>• 下腹部腹中线偏左或右1-2mm处（避开膀胱）
+                            <br>• 针头与皮肤呈30-45°角
+                            <br>• 刺入皮肤后进针3-5mm，感到落空感（进入腹腔）</li>
+                        <li><strong>回抽确认</strong>：
+                            <br>• 回抽针栓，确认无血液、肠液或尿液</li>
+                        <li><strong>注射</strong>：
+                            <br>• 缓慢注入药液
+                            <br>• 体积：0.1-0.2mL/10g体重</li>
+                        <li><strong>拔针</strong>：
+                            <br>• 缓慢拔针，轻压进针点防止漏液</li>
+                    </ol>
+                    
+                    <h5 style="color:var(--primary-blue-light);margin:12px 0 6px;">三、尾静脉注射(i.v.)</h5>
+                    <ol style="padding-left:20px;line-height:1.8;font-size:0.85rem;">
+                        <li><strong>血管扩张</strong>：
+                            <br>• 45-50°C温水浸泡尾巴2-3min，或
+                            <br>• 75%酒精棉球反复擦拭</li>
+                        <li><strong>固定与进针</strong>：
+                            <br>• 左手拇指和食指捏住尾根部，拉直尾巴
+                            <br>• 选择左右两侧静脉（背侧动脉不用）
+                            <br>• 针头与静脉呈15-20°角进针（尾端1/4处）</li>
+                        <li><strong>确认</strong>：
+                            <br>• 无阻力、无白色皮丘 = 成功进入血管</li>
+                        <li><strong>注射</strong>：
+                            <br>• 缓慢推注，观察血管是否变白
+                            <br>• 体积：0.05-0.1mL/10g体重</li>
+                        <li><strong>止血</strong>：
+                            <br>• 拔针后用干棉球轻压1-2min止血</li>
+                    </ol>
+                    
+                    <div style="background:#fef3c7;padding:10px;border-radius:6px;margin-top:10px;font-size:0.8rem;">
+                        <strong>⚠️ 关键提醒（影响可复现性）：</strong>
+                        <br>① 灌胃时如动物呛咳，立即停止，可能误入气管导致死亡
+                        <br>② 腹腔注射回抽有血或尿液，需换位置重新进针
+                        <br>③ 尾静脉注射从尾端开始，向根部移动，可多次使用
+                        <br>④ 给药体积不要超过最大推荐量
+                        <br>⑤ 详细记录给药时间、剂量、途径、动物反应
                     </div>
                 ` : `
                     <h4 style="color:var(--primary-blue);margin-bottom:8px;">样本与试剂处理</h4>
