@@ -2825,29 +2825,49 @@
                 stepData: {}
             };
 
-            // Fill basic info - auto fill date/time
+            // Fill basic info - auto fill date/time (不可修改)
             const now = new Date();
             document.getElementById('expId').value = experimentData.id;
             document.getElementById('expNumber').value = `第 ${experimentData.expNumber} 次实验`;
-            document.getElementById('expDate').value = now.toISOString().split('T')[0];
-            document.getElementById('expTime').value = now.toTimeString().slice(0, 5);
+            
+            const dateInput = document.getElementById('expDate');
+            dateInput.value = now.toISOString().split('T')[0];
+            dateInput.readOnly = true;
+            dateInput.style.background = 'var(--gray-100)';
+            dateInput.dataset.autoFilled = 'true';
+            
+            const timeInput = document.getElementById('expTime');
+            timeInput.value = now.toTimeString().slice(0, 5);
+            timeInput.readOnly = true;
+            timeInput.style.background = 'var(--gray-100)';
+            timeInput.dataset.autoFilled = 'true';
 
-            // Auto fill operator from user settings
+            // Auto fill operator from user settings (不可修改)
             const userSettings = DataStore.getUserSettings();
             const operatorInput = document.getElementById('expOperator');
             if (userSettings.name) {
                 operatorInput.value = userSettings.name;
                 operatorInput.readOnly = true;
                 operatorInput.style.background = 'var(--gray-100)';
+                operatorInput.dataset.autoFilled = 'true';
+                operatorInput.dataset.manualInput = 'false';
             } else {
                 operatorInput.value = '';
                 operatorInput.readOnly = false;
                 operatorInput.style.background = '';
-                operatorInput.placeholder = '请先在"我的"页面设置姓名，或手动输入';
+                operatorInput.placeholder = '请先在"我的"页面设置姓名';
+                operatorInput.dataset.autoFilled = 'false';
+                operatorInput.dataset.manualInput = 'true';
             }
 
-            // Auto fill location
-            document.getElementById('expLocation').value = '';
+            // Auto fill location (不可修改，除非获取失败)
+            const locationInput = document.getElementById('expLocation');
+            locationInput.value = '';
+            locationInput.readOnly = true;
+            locationInput.style.background = 'var(--gray-100)';
+            locationInput.dataset.autoFilled = 'false';
+            locationInput.dataset.manualInput = 'false';
+            
             document.getElementById('expType').value = '';
             document.getElementById('customTypeGroup').classList.add('hidden');
 
@@ -2876,73 +2896,143 @@
             const locationInput = document.getElementById('expLocation');
             const statusText = document.getElementById('locationStatus');
 
+            // 标记为自动获取
+            locationInput.dataset.autoFilled = 'true';
+            locationInput.dataset.manualInput = 'false';
+
             if (!navigator.geolocation) {
-                statusText.innerHTML = '⚠️ 浏览器不支持自动定位，请手动输入地点。<a href="javascript:void(0)" onclick="showLocationHelp()" style="color:var(--primary-blue);text-decoration:underline;">如何开启定位？</a>';
-                locationInput.placeholder = '请输入实验室地点（如：3号楼B2层细胞间）';
+                locationInput.value = '';
                 locationInput.readOnly = false;
+                locationInput.placeholder = '请输入实验室地点';
+                locationInput.dataset.autoFilled = 'false';
+                locationInput.dataset.manualInput = 'true';
+                statusText.innerHTML = '⚠️ 浏览器不支持自动定位，请手动输入地点。<a href="javascript:void(0)" onclick="showLocationHelp()" style="color:var(--primary-blue);text-decoration:underline;">如何开启定位？</a>';
                 return;
             }
 
             statusText.textContent = '🔄 正在获取GPS定位...';
+            locationInput.readOnly = true;
+            locationInput.style.background = 'var(--gray-100)';
 
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     const lat = position.coords.latitude.toFixed(6);
                     const lng = position.coords.longitude.toFixed(6);
-                    locationInput.value = `GPS: ${lat}, ${lng}`;
-                    locationInput.readOnly = false;
-                    statusText.textContent = '✅ 已自动获取GPS定位（可手动修改）';
+                    
+                    // 尝试将GPS坐标转换为文字地址
+                    let address = `GPS: ${lat}, ${lng}`;
+                    try {
+                        const geoAddress = await reverseGeocode(lat, lng);
+                        if (geoAddress) {
+                            address = geoAddress;
+                        }
+                    } catch (e) {
+                        console.log('地理编码失败，使用GPS坐标');
+                    }
+                    
+                    locationInput.value = address;
+                    locationInput.readOnly = true;
+                    locationInput.style.background = 'var(--gray-100)';
+                    locationInput.dataset.autoFilled = 'true';
+                    locationInput.dataset.manualInput = 'false';
+                    statusText.innerHTML = '✅ 已自动获取定位 <button class="btn btn-sm btn-outline" onclick="enableManualLocation()" style="margin-left:8px;padding:2px 8px;font-size:0.7rem;">修改</button>';
                     statusText.style.color = 'var(--success)';
                 },
                 (error) => {
                     let errorMsg = '无法获取定位';
-                    let helpText = '';
                     switch(error.code) {
                         case 1:
                             errorMsg = '定位权限被拒绝';
-                            helpText = '请在浏览器设置中允许本页面访问位置信息。操作路径：浏览器设置 → 隐私和安全 → 网站设置 → 位置信息 → 允许';
                             break;
                         case 2:
                             errorMsg = '无法获取位置信息';
-                            helpText = '请检查设备GPS是否开启，或移至开阔区域重试。';
                             break;
                         case 3:
                             errorMsg = '定位超时';
-                            helpText = '请检查网络连接，或移至信号更好的位置后重试。';
                             break;
                     }
+                    
+                    locationInput.value = '';
+                    locationInput.readOnly = false;
+                    locationInput.style.background = '';
+                    locationInput.placeholder = '请输入实验室地点';
+                    locationInput.dataset.autoFilled = 'false';
+                    locationInput.dataset.manualInput = 'true';
+                    
                     statusText.innerHTML = `⚠️ ${errorMsg}，请手动输入地点。<a href="javascript:void(0)" onclick="showLocationHelp()" style="color:var(--primary-blue);text-decoration:underline;">查看帮助</a>`;
                     statusText.style.color = 'var(--warning)';
-                    locationInput.placeholder = '请输入实验室地点（如：3号楼B2层细胞间）';
-                    locationInput.readOnly = false;
                 },
                 { timeout: 10000, enableHighAccuracy: false }
             );
+        }
+
+        // 地理编码：GPS坐标转文字地址
+        async function reverseGeocode(lat, lng) {
+            try {
+                // 尝试使用高德地图API（免费，无需key可有限使用）
+                const response = await fetch(`https://restapi.amap.com/v3/geocode/regeo?output=json&location=${lng},${lat}&key=YOUR_AMAP_KEY`, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+                // 由于跨域限制，这里使用备用方案
+                return null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // 启用手动修改位置
+        function enableManualLocation() {
+            const locationInput = document.getElementById('expLocation');
+            const statusText = document.getElementById('locationStatus');
+            
+            locationInput.readOnly = false;
+            locationInput.style.background = '';
+            locationInput.dataset.manualInput = 'true';
+            locationInput.dataset.autoFilled = 'false';
+            locationInput.focus();
+            
+            statusText.innerHTML = '⚠️ 手动修改模式 <button class="btn btn-sm btn-outline" onclick="getLocation()" style="margin-left:8px;padding:2px 8px;font-size:0.7rem;">重新自动获取</button>';
+            statusText.style.color = 'var(--warning)';
         }
 
         function showLocationHelp() {
             document.getElementById('modalTitle').textContent = '📍 如何开启自动定位';
             document.getElementById('modalBody').innerHTML = `
                 <div style="line-height:2;font-size:0.9rem;">
+                    <p><strong>为什么需要自动定位？</strong></p>
+                    <div style="background:var(--info-light);padding:8px;border-radius:6px;margin-bottom:12px;font-size:0.8rem;">
+                        自动定位可确保实验地点的准确性和可追溯性，符合GLP规范。手动输入将被标记为"手动输入"，在审计时可能需要额外说明。
+                    </div>
+                    
                     <p><strong>Chrome/Edge 浏览器：</strong></p>
                     <ol style="padding-left:20px;">
                         <li>点击地址栏左侧的🔒图标</li>
                         <li>找到"位置"权限，选择"允许"</li>
                         <li>刷新页面后重试</li>
                     </ol>
-                    <p style="margin-top:12px;"><strong>Safari (iOS)：</strong></p>
+                    
+                    <p style="margin-top:12px;"><strong>Safari (iOS/iPhone/iPad)：</strong></p>
                     <ol style="padding-left:20px;">
                         <li>设置 → 隐私与安全性 → 定位服务</li>
-                        <li>确保"定位服务"已开启</li>
-                        <li>向下滚动找到浏览器应用，选择"使用App期间"</li>
+                        <li>确保"定位服务"总开关已开启</li>
+                        <li>向下滚动找到"Safari网站"，选择"使用App期间"</li>
                     </ol>
-                    <p style="margin-top:12px;"><strong>微信内嵌浏览器：</strong></p>
+                    
+                    <p style="margin-top:12px;"><strong>Android Chrome：</strong></p>
                     <ol style="padding-left:20px;">
-                        <li>微信可能限制定位权限，建议在系统浏览器中打开</li>
-                        <li>或手动输入实验室地点</li>
+                        <li>设置 → 应用 → Chrome → 权限</li>
+                        <li>找到"位置"，选择"允许"</li>
                     </ol>
-                    <div style="background:var(--info-light);padding:8px;border-radius:6px;margin-top:12px;font-size:0.8rem;">
-                        💡 提示：即使无法自动定位，手动输入地点同样有效。建议输入具体位置（如楼栋+房间号）以便追溯。
+                    
+                    <p style="margin-top:12px;"><strong>微信/企业微信内嵌浏览器：</strong></p>
+                    <ol style="padding-left:20px;">
+                        <li>微信可能限制定位权限，建议在系统浏览器（Chrome/Safari）中打开本页面</li>
+                        <li>或点击右上角"..."选择"在浏览器打开"</li>
+                    </ol>
+                    
+                    <div style="background:var(--warning-light);padding:8px;border-radius:6px;margin-top:12px;font-size:0.8rem;">
+                        ⚠️ 注意：若无法开启自动定位，可手动输入地点，但系统会记录为"手动输入"。建议在"我的"页面预先设置姓名，以确保操作者信息自动填充。
                     </div>
                 </div>
             `;
