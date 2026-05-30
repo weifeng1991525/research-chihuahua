@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>科研吉娃娃 Genewawa</title>
+    <title>科研吉娃娃科研实验管理工具</title>
     <script src="https://unpkg.com/docx@8.5.0/build/index.umd.min.js"></script>
     <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         /* ===== CSS Variables & Reset ===== */
         :root {
@@ -1195,6 +1196,79 @@
         .app-container.no-nav {
             padding-bottom: 0;
         }
+        /* ===== OCR Modal ===== */
+        .ocr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ocr-modal.active { display: flex; }
+        .ocr-modal.hidden { display: none; }
+        .ocr-content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .ocr-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: var(--radius);
+            margin-bottom: var(--spacing);
+        }
+        .ocr-loading {
+            text-align: center;
+            padding: var(--spacing-lg);
+        }
+        .ocr-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--spacing);
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .ocr-result-item {
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+        .ocr-result-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-bottom: 4px;
+        }
+        .ocr-result-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .ocr-result-input {
+            width: 100%;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: 6px 8px;
+            font-size: 0.85rem;
+        }
+        .ocr-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing);
+        }
     </style>
 </head>
 <body>
@@ -1515,6 +1589,19 @@
             <div class="nav-label">我的</div>
         </div>
     </nav>
+
+    <!-- OCR Modal -->
+    <div class="ocr-modal hidden" id="ocrModal">
+        <div class="ocr-content">
+            <div class="card-header">
+                <span class="card-title">📷 文字识别结果</span>
+                <button class="btn btn-sm btn-outline" onclick="closeOCRModal()">✕</button>
+            </div>
+            <div class="card-body" id="ocrModalBody">
+                <!-- OCR content will be rendered here -->
+            </div>
+        </div>
+    </div>
 
     <!-- Modal for Step Detail -->
     <div class="modal-overlay" id="stepDetailModal">
@@ -2976,11 +3063,14 @@
                     </div>
                     <div class="sop-guide-body">
                         ${sopGuide}
+                        <button class="btn btn-outline" style="margin-top:8px;width:100%;font-size:0.85rem;" onclick="showStepDetail(1)">
+                            📖 详细说明（完整操作手册）
+                        </button>
                     </div>
                 </div>
 
                 <div class="alert alert-warning">
-                    <strong>⚠️ 关键记录点 1</strong> — 请拍照记录实验前准备状态
+                    <strong>⚠️ 关键记录点 1</strong> — 请拍照记录实验前准备状态（自动识别文字信息）
                 </div>
 
                 <div class="form-group compact">
@@ -3261,6 +3351,8 @@
             `;
         }
 
+        let currentOCRFile = null;
+
         function handleFileUpload(input, step) {
             if (input.files && input.files.length > 0) {
                 const files = Array.from(input.files);
@@ -3269,28 +3361,36 @@
 
                 files.forEach(file => {
                     const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-                    const fileData = {
-                        id: fileId,
-                        name: file.name,
-                        type: file.type,
-                        size: formatFileSize(file.size),
-                        step: step
-                    };
+                    const isImage = file.type && file.type.startsWith('image/');
 
-                    // Store file reference (in real app, would upload to server)
-                    if (!experimentData.stepData[`step${step}`]) {
-                        experimentData.stepData[`step${step}`] = {};
-                    }
-                    if (!experimentData.stepData[`step${step}`].files) {
-                        experimentData.stepData[`step${step}`].files = [];
-                    }
-                    experimentData.stepData[`step${step}`].files.push(fileData);
+                    // Step 1 图片触发OCR识别
+                    if (step === 1 && isImage) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            performOCR(e.target.result, file.name, step, fileId);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        const fileData = {
+                            id: fileId,
+                            name: file.name,
+                            type: file.type,
+                            size: formatFileSize(file.size),
+                            step: step
+                        };
 
-                    // Show preview
-                    addFilePreview(file.name, file.type, fileData.size, step, fileId);
+                        if (!experimentData.stepData[`step${step}`]) {
+                            experimentData.stepData[`step${step}`] = {};
+                        }
+                        if (!experimentData.stepData[`step${step}`].files) {
+                            experimentData.stepData[`step${step}`].files = [];
+                        }
+                        experimentData.stepData[`step${step}`].files.push(fileData);
+
+                        addFilePreview(file.name, file.type, fileData.size, step, fileId);
+                    }
                 });
 
-                // Clear input
                 input.value = '';
 
                 DataStore.addAuditLog({
@@ -3300,6 +3400,181 @@
                     operator: experimentData.operator || '当前用户'
                 });
             }
+        }
+
+        // OCR文字识别功能
+        async function performOCR(imageData, fileName, step, fileId) {
+            const modal = document.getElementById('ocrModal');
+            const body = document.getElementById('ocrModalBody');
+
+            modal.classList.remove('hidden');
+            modal.classList.add('active');
+
+            body.innerHTML = `
+                <div style="text-align:center;padding:var(--spacing);">
+                    <div style="width:40px;height:40px;border:3px solid var(--gray-200);border-top-color:var(--primary-blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto var(--spacing);"></div>
+                    <div style="font-size:0.9rem;color:var(--gray-600);">正在识别图片中的文字...</div>
+                    <div style="font-size:0.75rem;color:var(--gray-400);margin-top:4px;">首次使用需加载识别引擎</div>
+                </div>
+                <img style="width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius);margin-bottom:var(--spacing);" src="${imageData}" alt="预览">
+            `;
+
+            currentOCRFile = { imageData, fileName, step, fileId };
+
+            try {
+                const result = await Tesseract.recognize(imageData, 'chi_sim+eng', {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            const progress = Math.round(m.progress * 100);
+                            const loadingDiv = body.querySelector('div[style*="animation:spin"]');
+                            if (loadingDiv) {
+                                loadingDiv.parentElement.querySelector('div:nth-child(2)').textContent = `识别进度: ${progress}%`;
+                            }
+                        }
+                    }
+                });
+
+                const text = result.data.text.trim();
+
+                if (!text || text.length < 3) {
+                    body.innerHTML = `
+                        <img style="width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius);margin-bottom:var(--spacing);" src="${imageData}" alt="预览">
+                        <div style="text-align:center;padding:var(--spacing);">
+                            <div style="color:var(--warning);font-weight:600;">⚠️ 无法识别图片中的文字</div>
+                            <div style="font-size:0.8rem;color:var(--gray-500);margin-top:8px;">
+                                可能原因：图片模糊、光线不足、文字过小
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:var(--spacing-sm);margin-top:var(--spacing);">
+                            <button class="btn btn-outline" onclick="closeOCRModal()">🔄 重新拍摄</button>
+                            <button class="btn btn-primary" onclick="saveOCRWithoutText()">忽略并保存</button>
+                        </div>
+                    `;
+                } else {
+                    const parsedInfo = parseOCRText(text);
+
+                    body.innerHTML = `
+                        <img style="width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius);margin-bottom:var(--spacing);" src="${imageData}" alt="预览">
+                        <div style="font-size:0.8rem;color:var(--gray-500);margin-bottom:var(--spacing-sm);">识别到的信息（可编辑确认）：</div>
+                        <div id="ocrResults">
+                            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:var(--spacing-sm);margin-bottom:var(--spacing-sm);">
+                                <div style="font-size:0.75rem;color:var(--gray-500);">试剂名称</div>
+                                <input type="text" style="width:100%;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.85rem;" id="ocr_reagentName" value="${parsedInfo.reagentName}" placeholder="未识别">
+                            </div>
+                            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:var(--spacing-sm);margin-bottom:var(--spacing-sm);">
+                                <div style="font-size:0.75rem;color:var(--gray-500);">批号</div>
+                                <input type="text" style="width:100%;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.85rem;" id="ocr_batchNo" value="${parsedInfo.batchNo}" placeholder="未识别">
+                            </div>
+                            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:var(--spacing-sm);margin-bottom:var(--spacing-sm);">
+                                <div style="font-size:0.75rem;color:var(--gray-500);">有效期</div>
+                                <input type="text" style="width:100%;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.85rem;" id="ocr_expiryDate" value="${parsedInfo.expiryDate}" placeholder="未识别">
+                            </div>
+                            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:var(--spacing-sm);margin-bottom:var(--spacing-sm);">
+                                <div style="font-size:0.75rem;color:var(--gray-500);">浓度</div>
+                                <input type="text" style="width:100%;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.85rem;" id="ocr_concentration" value="${parsedInfo.concentration}" placeholder="未识别">
+                            </div>
+                        </div>
+                        <div style="background:var(--gray-50);padding:8px;border-radius:var(--radius-sm);margin-top:var(--spacing-sm);">
+                            <div style="font-size:0.75rem;color:var(--gray-500);">原始识别文本：</div>
+                            <div style="font-size:0.8rem;white-space:pre-wrap;max-height:80px;overflow-y:auto;">${text}</div>
+                        </div>
+                        <div style="display:flex;gap:var(--spacing-sm);margin-top:var(--spacing);">
+                            <button class="btn btn-outline" onclick="closeOCRModal()">🔄 重新拍摄</button>
+                            <button class="btn btn-primary" onclick="saveOCRWithText()">✅ 确认保存</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('OCR error:', error);
+                body.innerHTML = `
+                    <img style="width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius);margin-bottom:var(--spacing);" src="${imageData}" alt="预览">
+                    <div style="text-align:center;padding:var(--spacing);">
+                        <div style="color:var(--danger);font-weight:600;">❌ 识别失败</div>
+                        <div style="font-size:0.8rem;color:var(--gray-500);margin-top:8px;">请检查网络后重试</div>
+                    </div>
+                    <div style="display:flex;gap:var(--spacing-sm);margin-top:var(--spacing);">
+                        <button class="btn btn-outline" onclick="closeOCRModal()">🔄 重试</button>
+                        <button class="btn btn-primary" onclick="saveOCRWithoutText()">忽略并保存</button>
+                    </div>
+                `;
+            }
+        }
+
+        function parseOCRText(text) {
+            const info = { reagentName: '', batchNo: '', expiryDate: '', concentration: '' };
+
+            // 提取批号
+            const batchMatch = text.match(/批号[：:]*([A-Za-z0-9\-]+)/i) || text.match(/Batch[:\s]*([A-Za-z0-9\-]+)/i) || text.match(/Lot[:\s]*([A-Za-z0-9\-]+)/i);
+            if (batchMatch) info.batchNo = batchMatch[1].trim();
+
+            // 提取有效期
+            const expiryMatch = text.match(/有效期[至到]*[：:]*(\d{4}[\-\/年]\d{1,2}[\-\/月]\d{0,2}日?)/i) || text.match(/Expir[y]?[：:]*(\d{4}[\-\/]\d{1,2}[\-\/]\d{1,2})/i);
+            if (expiryMatch) info.expiryDate = expiryMatch[1].trim();
+
+            // 提取浓度
+            const concMatch = text.match(/浓度[：:]*([0-9\.]+[mMµμn]?[MolL%])/i) || text.match(/([0-9\.]+[mMµμn]?[MolL%])/i);
+            if (concMatch) info.concentration = concMatch[1].trim();
+
+            // 提取试剂名称（第一行或包含关键词的行）
+            const lines = text.split('\n').filter(l => l.trim());
+            if (lines.length > 0) {
+                info.reagentName = lines[0].trim().substring(0, 30);
+            }
+
+            return info;
+        }
+
+        function saveOCRWithoutText() {
+            if (!currentOCRFile) return;
+            const { imageData, fileName, step, fileId } = currentOCRFile;
+
+            if (!experimentData.stepData[`step${step}`]) experimentData.stepData[`step${step}`] = {};
+            if (!experimentData.stepData[`step${step}`].files) experimentData.stepData[`step${step}`].files = [];
+
+            experimentData.stepData[`step${step}`].files.push({
+                id: fileId, name: fileName, type: 'image', data: imageData, ocrText: ''
+            });
+
+            addFilePreview(fileName, 'image', '已保存', step, fileId, imageData);
+            closeOCRModal();
+        }
+
+        function saveOCRWithText() {
+            if (!currentOCRFile) return;
+            const { imageData, fileName, step, fileId } = currentOCRFile;
+
+            const ocrInfo = {
+                reagentName: document.getElementById('ocr_reagentName')?.value || '',
+                batchNo: document.getElementById('ocr_batchNo')?.value || '',
+                expiryDate: document.getElementById('ocr_expiryDate')?.value || '',
+                concentration: document.getElementById('ocr_concentration')?.value || ''
+            };
+
+            if (!experimentData.stepData[`step${step}`]) experimentData.stepData[`step${step}`] = {};
+            if (!experimentData.stepData[`step${step}`].files) experimentData.stepData[`step${step}`].files = [];
+
+            experimentData.stepData[`step${step}`].files.push({
+                id: fileId, name: fileName, type: 'image', data: imageData, ocrInfo: ocrInfo
+            });
+
+            addFilePreview(fileName, 'image', '已保存', step, fileId, imageData);
+
+            // 自动填充批号到表单
+            if (ocrInfo.batchNo) {
+                const sampleInput = document.getElementById('sampleCheck');
+                if (sampleInput && !sampleInput.value) {
+                    sampleInput.value = `批号: ${ocrInfo.batchNo}`;
+                }
+            }
+
+            closeOCRModal();
+        }
+
+        function closeOCRModal() {
+            const modal = document.getElementById('ocrModal');
+            modal.classList.remove('active');
+            modal.classList.add('hidden');
+            currentOCRFile = null;
         }
 
         function addFilePreview(name, type, size, step, fileId) {
