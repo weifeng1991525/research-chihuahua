@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>科研吉娃娃 Genewawa</title>
+    <script src="https://unpkg.com/docx@8.5.0/build/index.umd.min.js"></script>
+    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <style>
         /* ===== CSS Variables & Reset ===== */
         :root {
@@ -1034,6 +1036,165 @@
         .form-group.compact { margin-bottom: var(--spacing-sm); }
         .form-group.compact textarea { min-height: 60px; }
 
+        /* ===== Bottom Navigation ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            background: var(--white);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+            z-index: 200;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 6px;
+            cursor: pointer;
+            transition: color 0.2s;
+            color: var(--gray-500);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+        }
+
+        /* ===== My Profile Page ===== */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            color: var(--white);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto var(--spacing-sm);
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+
+        .profile-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .profile-title {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .settings-section {
+            margin-bottom: var(--spacing);
+        }
+
+        .settings-section .card-header {
+            background: var(--gray-50);
+        }
+
+        .perm-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .perm-badge.admin {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .perm-badge.member {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .perm-badge.viewer {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .member-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .member-card:last-child {
+            border-bottom: none;
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-blue-light);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .member-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .member-role {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        /* Ensure bottom nav doesn't cover content */
+        .app-container {
+            padding-bottom: 60px;
+        }
+
+        /* Hide bottom nav on non-home pages */
+        .bottom-nav.hidden {
+            display: none;
+        }
+
+        .app-container.no-nav {
+            padding-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -1065,16 +1226,55 @@
                 </div>
             </div>
 
-            <div id="projectList">
-                <!-- Projects will be rendered here -->
+            <div style="display:flex;gap:var(--spacing-sm);margin-bottom:var(--spacing);">
+                <button class="btn btn-primary" style="flex:1;" onclick="showAddProjectForm()">＋ 新建项目</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="exportAllData()">📥 导出数据</button>
             </div>
 
-            <div class="card" style="margin-top: var(--spacing-lg);">
-                <div class="card-body text-center">
-                    <button class="btn btn-outline" onclick="exportAllData()">
-                        📥 导出所有数据
-                    </button>
+            <div id="addProjectForm" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">📋 新建项目</span>
+                        <button class="btn btn-sm btn-outline" onclick="hideAddProjectForm()">取消</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">项目名称 <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="newProjectName" placeholder="请输入项目名称">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">项目负责人(PI) <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="newProjectPI" placeholder="请输入PI姓名">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">研究目的</label>
+                            <textarea class="form-control" id="newProjectPurpose" rows="2" placeholder="简要描述研究目的"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">研究假说</label>
+                            <textarea class="form-control" id="newProjectHypothesis" rows="2" placeholder="简要描述研究假说"></textarea>
+                        </div>
+                        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing);">
+                            <div class="form-group">
+                                <label class="form-label">伦理编号</label>
+                                <input type="text" class="form-control" id="newProjectEthics" placeholder="如: IRB-2024-xxxx">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">风险等级</label>
+                                <select class="form-control" id="newProjectRisk">
+                                    <option value="low">低风险</option>
+                                    <option value="medium" selected>中风险</option>
+                                    <option value="high">高风险</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="addNewProject()">确认创建</button>
+                    </div>
                 </div>
+            </div>
+
+            <div id="projectList">
+                <!-- Projects will be rendered here -->
             </div>
         </div>
 
@@ -1281,7 +1481,40 @@
                 <!-- Print content will be rendered here -->
             </div>
         </div>
+
+        <!-- Page 10: My Profile & Settings -->
+        <div class="page" id="page-my-profile">
+            <div id="myProfileContent">
+                <!-- Will be rendered by JS -->
+            </div>
+        </div>
+
+        <!-- Page 11: Group Management -->
+        <div class="page" id="page-group-manage">
+            <div id="groupManageContent">
+                <!-- Will be rendered by JS -->
+            </div>
+        </div>
+
+        <!-- Page 12: Member Permission -->
+        <div class="page" id="page-member-perm">
+            <div id="memberPermContent">
+                <!-- Will be rendered by JS -->
+            </div>
+        </div>
     </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="nav-item active" onclick="switchTab('project-list')">
+            <div class="nav-icon">📋</div>
+            <div class="nav-label">项目</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('my-profile')">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">我的</div>
+        </div>
+    </nav>
 
     <!-- Modal for Step Detail -->
     <div class="modal-overlay" id="stepDetailModal">
@@ -1413,6 +1646,56 @@
                 if (!localStorage.getItem('rc_audit_logs')) {
                     localStorage.setItem('rc_audit_logs', JSON.stringify([]));
                 }
+                if (!localStorage.getItem('rc_user_settings')) {
+                    localStorage.setItem('rc_user_settings', JSON.stringify({
+                        name: '',
+                        title: '',
+                        department: '',
+                        lab: '',
+                        phone: '',
+                        email: ''
+                    }));
+                }
+                if (!localStorage.getItem('rc_groups')) {
+                    localStorage.setItem('rc_groups', JSON.stringify([
+                        {
+                            id: 'GRP-001',
+                            name: '默认课题组',
+                            admin: '',
+                            members: [],
+                            createdAt: new Date().toISOString()
+                        }
+                    ]));
+                }
+            },
+
+            getUserSettings() {
+                return JSON.parse(localStorage.getItem('rc_user_settings') || '{}');
+            },
+
+            saveUserSettings(settings) {
+                localStorage.setItem('rc_user_settings', JSON.stringify(settings));
+            },
+
+            getGroups() {
+                return JSON.parse(localStorage.getItem('rc_groups') || '[]');
+            },
+
+            saveGroup(group) {
+                const groups = this.getGroups();
+                const index = groups.findIndex(g => g.id === group.id);
+                if (index >= 0) {
+                    groups[index] = group;
+                } else {
+                    groups.push(group);
+                }
+                localStorage.setItem('rc_groups', JSON.stringify(groups));
+            },
+
+            deleteGroup(id) {
+                let groups = this.getGroups();
+                groups = groups.filter(g => g.id !== id);
+                localStorage.setItem('rc_groups', JSON.stringify(groups));
             },
 
             getProjects() {
@@ -1432,6 +1715,16 @@
                     projects.push(project);
                 }
                 localStorage.setItem('rc_projects', JSON.stringify(projects));
+            },
+
+            deleteProject(id) {
+                let projects = this.getProjects();
+                projects = projects.filter(p => p.id !== id);
+                localStorage.setItem('rc_projects', JSON.stringify(projects));
+                // Also delete related experiments
+                let exps = JSON.parse(localStorage.getItem('rc_experiments') || '[]');
+                exps = exps.filter(e => e.projectId !== id);
+                localStorage.setItem('rc_experiments', JSON.stringify(exps));
             },
 
             getExperiments(projectId) {
@@ -1913,14 +2206,15 @@
                     <div class="empty-state">
                         <div class="empty-icon">📋</div>
                         <div class="empty-title">暂无项目</div>
-                        <div class="empty-text">点击右上角添加新项目</div>
+                        <div class="empty-text">点击上方"新建项目"按钮创建第一个项目</div>
                     </div>
                 `;
                 return;
             }
 
             container.innerHTML = projects.map(project => `
-                <div class="card project-card" onclick="openProject('${project.id}')">
+                <div class="card project-card" style="position:relative;">
+                    <div onclick="openProject('${project.id}')" style="cursor:pointer;">
                     <div class="card-body">
                         <div class="project-header">
                             <div class="project-name">${project.name}</div>
@@ -1928,16 +2222,16 @@
                         </div>
                         <div class="project-meta">
                             <span class="meta-tag primary">👤 ${project.pi}</span>
-                            <span class="meta-tag success">📍 ${project.stage}</span>
+                            <span class="meta-tag success">📍 ${project.stage || '未开始'}</span>
                             ${getRiskBadge(project.riskLevel)}
                         </div>
                         <div class="project-stats">
                             <div class="stat-item">
-                                <div class="stat-value">${project.totalExperiments}</div>
+                                <div class="stat-value">${project.totalExperiments || 0}</div>
                                 <div class="stat-label">累计实验</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">${project.progress}%</div>
+                                <div class="stat-value">${project.progress || 0}%</div>
                                 <div class="stat-label">项目进度</div>
                             </div>
                             <div class="stat-item">
@@ -1948,10 +2242,10 @@
                         <div class="progress-section">
                             <div class="progress-header">
                                 <span>项目进度</span>
-                                <span>${project.progress}%</span>
+                                <span>${project.progress || 0}%</span>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${project.progress}%"></div>
+                                <div class="progress-fill" style="width: ${project.progress || 0}%"></div>
                             </div>
                         </div>
                         ${project.riskNote ? `
@@ -1960,6 +2254,11 @@
                                 <span>${project.riskNote}</span>
                             </div>
                         ` : ''}
+                    </div>
+                    </div>
+                    <div style="position:absolute;top:8px;right:8px;">
+                        <button class="btn btn-sm btn-outline" style="padding:2px 8px;font-size:0.7rem;color:var(--danger);border-color:var(--danger);"
+                                onclick="event.stopPropagation();confirmDeleteProject('${project.id}','${project.name}')">删除</button>
                     </div>
                 </div>
             `).join('');
@@ -2439,12 +2738,28 @@
                 stepData: {}
             };
 
-            // Fill basic info
+            // Fill basic info - auto fill date/time
+            const now = new Date();
             document.getElementById('expId').value = experimentData.id;
             document.getElementById('expNumber').value = `第 ${experimentData.expNumber} 次实验`;
-            document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('expTime').value = new Date().toTimeString().slice(0, 5);
-            document.getElementById('expOperator').value = '';
+            document.getElementById('expDate').value = now.toISOString().split('T')[0];
+            document.getElementById('expTime').value = now.toTimeString().slice(0, 5);
+
+            // Auto fill operator from user settings
+            const userSettings = DataStore.getUserSettings();
+            const operatorInput = document.getElementById('expOperator');
+            if (userSettings.name) {
+                operatorInput.value = userSettings.name;
+                operatorInput.readOnly = true;
+                operatorInput.style.background = 'var(--gray-100)';
+            } else {
+                operatorInput.value = '';
+                operatorInput.readOnly = false;
+                operatorInput.style.background = '';
+                operatorInput.placeholder = '请先在"我的"页面设置姓名，或手动输入';
+            }
+
+            // Auto fill location
             document.getElementById('expLocation').value = '';
             document.getElementById('expType').value = '';
             document.getElementById('customTypeGroup').classList.add('hidden');
@@ -2475,24 +2790,76 @@
             const statusText = document.getElementById('locationStatus');
 
             if (!navigator.geolocation) {
-                statusText.textContent = '浏览器不支持定位，请手动输入';
-                locationInput.placeholder = '请输入实验室地点';
+                statusText.innerHTML = '⚠️ 浏览器不支持自动定位，请手动输入地点。<a href="javascript:void(0)" onclick="showLocationHelp()" style="color:var(--primary-blue);text-decoration:underline;">如何开启定位？</a>';
+                locationInput.placeholder = '请输入实验室地点（如：3号楼B2层细胞间）';
+                locationInput.readOnly = false;
                 return;
             }
+
+            statusText.textContent = '🔄 正在获取GPS定位...';
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const lat = position.coords.latitude.toFixed(6);
                     const lng = position.coords.longitude.toFixed(6);
                     locationInput.value = `GPS: ${lat}, ${lng}`;
-                    statusText.textContent = '✅ 已获取GPS定位（可手动修改）';
+                    locationInput.readOnly = false;
+                    statusText.textContent = '✅ 已自动获取GPS定位（可手动修改）';
+                    statusText.style.color = 'var(--success)';
                 },
                 (error) => {
-                    statusText.textContent = '无法获取定位，请手动输入';
-                    locationInput.placeholder = '请输入实验室地点';
+                    let errorMsg = '无法获取定位';
+                    let helpText = '';
+                    switch(error.code) {
+                        case 1:
+                            errorMsg = '定位权限被拒绝';
+                            helpText = '请在浏览器设置中允许本页面访问位置信息。操作路径：浏览器设置 → 隐私和安全 → 网站设置 → 位置信息 → 允许';
+                            break;
+                        case 2:
+                            errorMsg = '无法获取位置信息';
+                            helpText = '请检查设备GPS是否开启，或移至开阔区域重试。';
+                            break;
+                        case 3:
+                            errorMsg = '定位超时';
+                            helpText = '请检查网络连接，或移至信号更好的位置后重试。';
+                            break;
+                    }
+                    statusText.innerHTML = `⚠️ ${errorMsg}，请手动输入地点。<a href="javascript:void(0)" onclick="showLocationHelp()" style="color:var(--primary-blue);text-decoration:underline;">查看帮助</a>`;
+                    statusText.style.color = 'var(--warning)';
+                    locationInput.placeholder = '请输入实验室地点（如：3号楼B2层细胞间）';
+                    locationInput.readOnly = false;
                 },
                 { timeout: 10000, enableHighAccuracy: false }
             );
+        }
+
+        function showLocationHelp() {
+            document.getElementById('modalTitle').textContent = '📍 如何开启自动定位';
+            document.getElementById('modalBody').innerHTML = `
+                <div style="line-height:2;font-size:0.9rem;">
+                    <p><strong>Chrome/Edge 浏览器：</strong></p>
+                    <ol style="padding-left:20px;">
+                        <li>点击地址栏左侧的🔒图标</li>
+                        <li>找到"位置"权限，选择"允许"</li>
+                        <li>刷新页面后重试</li>
+                    </ol>
+                    <p style="margin-top:12px;"><strong>Safari (iOS)：</strong></p>
+                    <ol style="padding-left:20px;">
+                        <li>设置 → 隐私与安全性 → 定位服务</li>
+                        <li>确保"定位服务"已开启</li>
+                        <li>向下滚动找到浏览器应用，选择"使用App期间"</li>
+                    </ol>
+                    <p style="margin-top:12px;"><strong>微信内嵌浏览器：</strong></p>
+                    <ol style="padding-left:20px;">
+                        <li>微信可能限制定位权限，建议在系统浏览器中打开</li>
+                        <li>或手动输入实验室地点</li>
+                    </ol>
+                    <div style="background:var(--info-light);padding:8px;border-radius:6px;margin-top:12px;font-size:0.8rem;">
+                        💡 提示：即使无法自动定位，手动输入地点同样有效。建议输入具体位置（如楼栋+房间号）以便追溯。
+                    </div>
+                </div>
+            `;
+            document.getElementById('stepDetailModal').classList.add('active');
         }
 
         function onExpTypeChange() {
@@ -2602,7 +2969,7 @@
         function renderStep1(savedData) {
             const sopGuide = getSOPGuideForStep(1);
             return `
-                <div class="sop-guide" id="sopGuide1">
+                <div class="sop-guide open" id="sopGuide1">
                     <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide1')">
                         <span>📖 操作手册关键步骤指导</span>
                         <span class="sop-guide-toggle">▼</span>
@@ -2652,7 +3019,7 @@
         function renderStep2(savedData) {
             const sopGuide = getSOPGuideForStep(2);
             return `
-                <div class="sop-guide" id="sopGuide2">
+                <div class="sop-guide open" id="sopGuide2">
                     <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide2')">
                         <span>📖 操作手册关键步骤指导</span>
                         <span class="sop-guide-toggle">▼</span>
@@ -2761,7 +3128,7 @@
 
             const sopGuide = getSOPGuideForStep(3);
             return `
-                <div class="sop-guide" id="sopGuide3">
+                <div class="sop-guide open" id="sopGuide3">
                     <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide3')">
                         <span>📖 操作手册关键步骤指导</span>
                         <span class="sop-guide-toggle">▼</span>
@@ -2794,7 +3161,7 @@
         function renderStep4(savedData) {
             const sopGuide = getSOPGuideForStep(4);
             return `
-                <div class="sop-guide" id="sopGuide4">
+                <div class="sop-guide open" id="sopGuide4">
                     <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide4')">
                         <span>📖 操作手册关键步骤指导</span>
                         <span class="sop-guide-toggle">▼</span>
@@ -2845,7 +3212,7 @@
         function renderStep5(savedData) {
             const sopGuide = getSOPGuideForStep(5);
             return `
-                <div class="sop-guide" id="sopGuide5">
+                <div class="sop-guide open" id="sopGuide5">
                     <div class="sop-guide-header" onclick="toggleSOPGuide('sopGuide5')">
                         <span>📖 操作手册关键步骤指导</span>
                         <span class="sop-guide-toggle">▼</span>
@@ -3569,24 +3936,527 @@
             viewExperimentDetail(currentExperiment.id);
         }
 
-        // ===== Export All Data =====
+        // ===== Export All Data as DOCX =====
         function exportAllData() {
-            const data = DataStore.exportAll();
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `research_chihuahua_full_export_${formatDateFile(new Date())}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+            try {
+                const data = DataStore.exportAll();
+                const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, TableRow, TableCell, Table, WidthType } = docx;
 
-            alert('全部数据导出成功！');
+                const children = [];
+
+                // Title
+                children.push(new Paragraph({
+                    children: [new TextRun({ text: '科研吉娃娃 Genewawa — 实验数据导出报告', bold: true, size: 32, font: { name: 'SimSun' } })],
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 200, line: 360 }
+                }));
+
+                // Export time
+                children.push(new Paragraph({
+                    children: [new TextRun({ text: `导出时间：${new Date().toLocaleString('zh-CN')}`, size: 24, font: { name: 'Times New Roman' }, color: '666666' })],
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 400, line: 360 }
+                }));
+
+                // Projects
+                data.projects.forEach((project, idx) => {
+                    children.push(new Paragraph({
+                        children: [new TextRun({ text: `项目 ${idx + 1}：${project.name}`, bold: true, size: 28, font: { name: 'SimSun' } })],
+                        heading: HeadingLevel.HEADING_2,
+                        spacing: { before: 300, after: 100, line: 360 }
+                    }));
+
+                    const projectFields = [
+                        `项目编号：${project.id}`,
+                        `负责人：${project.pi}`,
+                        `研究目的：${project.purpose || '-'}`,
+                        `研究假说：${project.hypothesis || '-'}`,
+                        `伦理编号：${project.ethicsId || '-'}`,
+                        `当前阶段：${project.stage || '-'}`,
+                        `项目进度：${project.progress || 0}%`,
+                        `累计实验：${project.totalExperiments || 0}`,
+                        `最近实验：${project.lastExpDate || '-'}`
+                    ];
+                    if (project.riskNote) projectFields.push(`风险提示：${project.riskNote}`);
+
+                    projectFields.forEach(field => {
+                        children.push(new Paragraph({
+                            children: [new TextRun({ text: field, size: 24, font: { name: 'SimSun' } })],
+                            spacing: { after: 60, line: 360 }
+                        }));
+                    });
+
+                    // Experiments for this project
+                    const projectExps = data.experiments.filter(e => e.projectId === project.id);
+                    if (projectExps.length > 0) {
+                        children.push(new Paragraph({
+                            children: [new TextRun({ text: `实验记录（共 ${projectExps.length} 条）`, bold: true, size: 24, font: { name: 'SimSun' } })],
+                            spacing: { before: 200, after: 100, line: 360 }
+                        }));
+
+                        projectExps.forEach((exp, eIdx) => {
+                            children.push(new Paragraph({
+                                children: [new TextRun({ text: `实验 ${eIdx + 1}：${exp.id}`, bold: true, size: 24, font: { name: 'SimSun' } })],
+                                spacing: { before: 150, after: 60, line: 360 }
+                            }));
+
+                            const expFields = [
+                                `实验类型：${exp.type || '-'}`,
+                                `操作者：${exp.operator || '-'}`,
+                                `地点：${exp.location || '-'}`,
+                                `开始时间：${exp.startTime ? new Date(exp.startTime).toLocaleString('zh-CN') : '-'}`,
+                                `复核状态：${exp.reviewStatus === 'approved' ? '已通过' : exp.reviewStatus === 'rejected' ? '已驳回' : exp.reviewStatus === 'abnormal' ? '结果异常' : '待复核'}`
+                            ];
+
+                            expFields.forEach(field => {
+                                children.push(new Paragraph({
+                                    children: [new TextRun({ text: field, size: 24, font: { name: 'Times New Roman' } })],
+                                    spacing: { after: 40, line: 360 }
+                                }));
+                            });
+
+                            // Step data summary
+                            if (exp.stepData) {
+                                for (let s = 1; s <= 5; s++) {
+                                    const sd = exp.stepData[`step${s}`];
+                                    if (sd) {
+                                        const stepNames = ['实验前准备', '样本与试剂处理', '核心实验操作', '质量控制', '结果记录'];
+                                        const parts = [];
+                                        Object.entries(sd).forEach(([k, v]) => {
+                                            if (k !== 'files' && v) parts.push(`${k}: ${v}`);
+                                        });
+                                        if (parts.length > 0) {
+                                            children.push(new Paragraph({
+                                                children: [new TextRun({ text: `  步骤${s}(${stepNames[s-1]}): ${parts.join('; ')}`, size: 22, font: { name: 'SimSun' }, color: '444444' })],
+                                                spacing: { after: 40, line: 360 }
+                                            }));
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // Separator
+                    children.push(new Paragraph({
+                        children: [new TextRun({ text: '—'.repeat(40), size: 20, color: 'CCCCCC' })],
+                        spacing: { before: 200, after: 200, line: 360 }
+                    }));
+                });
+
+                // Audit logs summary
+                if (data.auditLogs && data.auditLogs.length > 0) {
+                    children.push(new Paragraph({
+                        children: [new TextRun({ text: `审计日志（最近 ${Math.min(data.auditLogs.length, 100)} 条）`, bold: true, size: 28, font: { name: 'SimSun' } })],
+                        heading: HeadingLevel.HEADING_2,
+                        spacing: { before: 300, after: 100, line: 360 }
+                    }));
+
+                    data.auditLogs.slice(0, 100).forEach(log => {
+                        children.push(new Paragraph({
+                            children: [new TextRun({
+                                text: `[${new Date(log.timestamp).toLocaleString('zh-CN')}] ${log.action} — ${log.detail || ''} (${log.operator || '-'})`,
+                                size: 22, font: { name: 'Times New Roman' }, color: '555555'
+                            })],
+                            spacing: { after: 40, line: 360 }
+                        }));
+                    });
+                }
+
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: children
+                    }]
+                });
+
+                Packer.toBlob(doc).then(blob => {
+                    saveAs(blob, `Genewawa_数据导出_${formatDateFile(new Date())}.docx`);
+                });
+
+            } catch (err) {
+                console.error('DOCX export error:', err);
+                // Fallback to JSON
+                const data = DataStore.exportAll();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Genewawa_export_${formatDateFile(new Date())}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                alert('DOCX生成失败，已导出JSON格式。请检查网络连接后重试。');
+            }
+        }
+
+        // ===== Tab Switching =====
+        function switchTab(pageId) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Clear navigation stack and show page
+            navigationStack = [];
+            showPage(pageId);
+            updateBackButton();
+
+            // Show/hide bottom nav
+            const bottomNav = document.getElementById('bottomNav');
+            const appContainer = document.querySelector('.app-container');
+            if (pageId === 'project-list' || pageId === 'my-profile') {
+                bottomNav.classList.remove('hidden');
+                appContainer.classList.remove('no-nav');
+            } else {
+                bottomNav.classList.add('hidden');
+                appContainer.classList.add('no-nav');
+            }
+
+            // Render page content
+            if (pageId === 'my-profile') {
+                renderMyProfile();
+            } else if (pageId === 'project-list') {
+                renderProjectList();
+            }
+        }
+
+        // ===== Add/Delete Project =====
+        function showAddProjectForm() {
+            document.getElementById('addProjectForm').style.display = 'block';
+            document.getElementById('newProjectName').focus();
+        }
+
+        function hideAddProjectForm() {
+            document.getElementById('addProjectForm').style.display = 'none';
+            // Clear form
+            document.getElementById('newProjectName').value = '';
+            document.getElementById('newProjectPI').value = '';
+            document.getElementById('newProjectPurpose').value = '';
+            document.getElementById('newProjectHypothesis').value = '';
+            document.getElementById('newProjectEthics').value = '';
+            document.getElementById('newProjectRisk').value = 'medium';
+        }
+
+        function addNewProject() {
+            const name = document.getElementById('newProjectName').value.trim();
+            const pi = document.getElementById('newProjectPI').value.trim();
+            const purpose = document.getElementById('newProjectPurpose').value.trim();
+            const hypothesis = document.getElementById('newProjectHypothesis').value.trim();
+            const ethicsId = document.getElementById('newProjectEthics').value.trim();
+            const riskLevel = document.getElementById('newProjectRisk').value;
+
+            if (!name) { alert('请输入项目名称'); return; }
+            if (!pi) { alert('请输入项目负责人'); return; }
+
+            const date = new Date();
+            const id = 'PRJ-' + date.getFullYear().toString().slice(2) +
+                String(date.getMonth() + 1).padStart(2, '0') +
+                String(date.getDate()).padStart(2, '0') + '-' +
+                Math.random().toString(36).substr(2, 3).toUpperCase();
+
+            const project = {
+                id: id,
+                name: name,
+                purpose: purpose,
+                hypothesis: hypothesis,
+                pi: pi,
+                ethicsId: ethicsId,
+                stage: '未开始',
+                progress: 0,
+                totalExperiments: 0,
+                lastExpDate: '',
+                riskLevel: riskLevel,
+                riskNote: '',
+                createdAt: new Date().toISOString(),
+                expectedIndicators: [],
+                relatedSOPs: []
+            };
+
+            DataStore.saveProject(project);
+            DataStore.addAuditLog({
+                projectId: id,
+                action: '创建项目',
+                detail: `创建项目: ${name}`,
+                operator: DataStore.getUserSettings().name || '当前用户'
+            });
+
+            hideAddProjectForm();
+            renderProjectList();
+            alert('项目创建成功！');
+        }
+
+        function confirmDeleteProject(id, name) {
+            if (confirm(`确定要删除项目"${name}"吗？\n\n删除后该项目及其所有实验记录将被永久移除，此操作不可撤销。`)) {
+                DataStore.deleteProject(id);
+                DataStore.addAuditLog({
+                    projectId: id,
+                    action: '删除项目',
+                    detail: `删除项目: ${name}`,
+                    operator: DataStore.getUserSettings().name || '当前用户'
+                });
+                renderProjectList();
+            }
+        }
+
+        // ===== My Profile Page =====
+        function renderMyProfile() {
+            const settings = DataStore.getUserSettings();
+            const groups = DataStore.getGroups();
+            const container = document.getElementById('myProfileContent');
+
+            const displayName = settings.name || '未设置姓名';
+            const displayTitle = settings.title || '点击设置个人信息';
+            const initial = settings.name ? settings.name.charAt(0).toUpperCase() : '?';
+
+            container.innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-avatar">${initial}</div>
+                    <div class="profile-name">${displayName}</div>
+                    <div class="profile-title">${displayTitle}</div>
+                </div>
+
+                <!-- Personal Settings -->
+                <div class="settings-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">⚙️ 个人设置</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">姓名 <span class="required">*</span></label>
+                                <input type="text" class="form-control" id="settingName" value="${settings.name || ''}" placeholder="请输入姓名（将自动填入实验记录）">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">职称</label>
+                                <input type="text" class="form-control" id="settingTitle" value="${settings.title || ''}" placeholder="如：副教授、博士生">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">科室/系</label>
+                                <input type="text" class="form-control" id="settingDept" value="${settings.department || ''}" placeholder="如：病理科、药理学系">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">实验室</label>
+                                <input type="text" class="form-control" id="settingLab" value="${settings.lab || ''}" placeholder="如：3号楼B2层分子生物学实验室">
+                            </div>
+                            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing);">
+                                <div class="form-group">
+                                    <label class="form-label">手机</label>
+                                    <input type="text" class="form-control" id="settingPhone" value="${settings.phone || ''}" placeholder="手机号码">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">邮箱</label>
+                                    <input type="text" class="form-control" id="settingEmail" value="${settings.email || ''}" placeholder="邮箱地址">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block" onclick="saveUserSettings()">保存设置</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group Management -->
+                <div class="settings-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">👥 课题组管理</span>
+                            <button class="btn btn-sm btn-primary" onclick="showAddGroupForm()">＋ 新建</button>
+                        </div>
+                        <div class="card-body" id="groupList">
+                            ${groups.length === 0 ? '<div class="empty-state"><div class="empty-text">暂无课题组</div></div>' :
+                            groups.map(g => `
+                                <div class="member-card" style="cursor:pointer;" onclick="openGroupManage('${g.id}')">
+                                    <div class="member-info">
+                                        <div class="member-avatar" style="background:var(--primary-blue);">组</div>
+                                        <div>
+                                            <div class="member-name">${g.name}</div>
+                                            <div class="member-role">管理员：${g.admin || '未设置'} · ${g.members.length} 名成员</div>
+                                        </div>
+                                    </div>
+                                    <span class="meta-tag primary">管理 →</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About -->
+                <div class="settings-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">ℹ️ 关于</span>
+                        </div>
+                        <div class="card-body" style="text-align:center;color:var(--gray-500);font-size:0.8rem;">
+                            <p>科研吉娃娃 Genewawa</p>
+                            <p>医学科研项目全流程管理工具</p>
+                            <p style="margin-top:8px;">版本 1.0.0</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveUserSettings() {
+            const name = document.getElementById('settingName').value.trim();
+            if (!name) {
+                alert('请输入姓名');
+                return;
+            }
+            const settings = {
+                name: name,
+                title: document.getElementById('settingTitle').value.trim(),
+                department: document.getElementById('settingDept').value.trim(),
+                lab: document.getElementById('settingLab').value.trim(),
+                phone: document.getElementById('settingPhone').value.trim(),
+                email: document.getElementById('settingEmail').value.trim()
+            };
+            DataStore.saveUserSettings(settings);
+            alert('个人设置保存成功！');
+            renderMyProfile();
+        }
+
+        // ===== Group Management =====
+        function showAddGroupForm() {
+            const name = prompt('请输入课题组名称：');
+            if (!name || !name.trim()) return;
+
+            const groups = DataStore.getGroups();
+            const id = 'GRP-' + Date.now().toString(36).toUpperCase();
+            const group = {
+                id: id,
+                name: name.trim(),
+                admin: DataStore.getUserSettings().name || '',
+                members: [],
+                createdAt: new Date().toISOString()
+            };
+            DataStore.saveGroup(group);
+            renderMyProfile();
+            alert('课题组创建成功！');
+        }
+
+        function openGroupManage(groupId) {
+            const groups = DataStore.getGroups();
+            const group = groups.find(g => g.id === groupId);
+            if (!group) return;
+            currentGroup = group;
+
+            const container = document.getElementById('groupManageContent');
+            const userSettings = DataStore.getUserSettings();
+            const isAdmin = group.admin === userSettings.name;
+
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">👥 ${group.name}</span>
+                        <span class="perm-badge admin">管理员：${group.admin || '未设置'}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">管理员姓名</label>
+                            <input type="text" class="form-control" id="groupAdmin" value="${group.admin || ''}" placeholder="课题组管理员姓名">
+                            <div class="form-text">管理员拥有查看所有实验记录的权限</div>
+                        </div>
+                        <button class="btn btn-outline btn-block" onclick="saveGroupAdmin()">保存管理员</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:var(--spacing);">
+                    <div class="card-header">
+                        <span class="card-title">📋 成员列表 (${group.members.length})</span>
+                        <button class="btn btn-sm btn-primary" onclick="showAddMemberForm()">＋ 添加成员</button>
+                    </div>
+                    <div class="card-body">
+                        ${group.members.length === 0 ? '<div class="empty-state"><div class="empty-text">暂无成员，点击上方添加</div></div>' :
+                        group.members.map((m, idx) => `
+                            <div class="member-card">
+                                <div class="member-info">
+                                    <div class="member-avatar">${m.name.charAt(0).toUpperCase()}</div>
+                                    <div>
+                                        <div class="member-name">${m.name}</div>
+                                        <div class="member-role">${m.title || '成员'}</div>
+                                    </div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <span class="perm-badge ${m.role === 'admin' ? 'admin' : m.role === 'member' ? 'member' : 'viewer'}">${m.role === 'admin' ? '管理员' : m.role === 'member' ? '可查看' : '仅查看'}</span>
+                                    <button class="btn btn-sm btn-outline" style="color:var(--danger);border-color:var(--danger);padding:2px 6px;" onclick="removeMember(${idx})">✕</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:var(--spacing);">
+                    <div class="card-header">
+                        <span class="card-title">🔐 权限说明</span>
+                    </div>
+                    <div class="card-body" style="font-size:0.8rem;color:var(--gray-600);line-height:1.8;">
+                        <p><span class="perm-badge admin">管理员</span> 拥有所有权限：查看/管理所有实验记录、管理成员</p>
+                        <p><span class="perm-badge member">可查看</span> 可查看课题组内所有项目的实验记录</p>
+                        <p><span class="perm-badge viewer">仅查看</span> 仅可查看被授权项目的实验记录</p>
+                        <div style="background:var(--info-light);padding:8px;border-radius:6px;margin-top:8px;">
+                            💡 默认课题组管理员拥有所有成员的实验记录查看权限。如需限制特定人员的查看范围，可将其角色设为"仅查看"。
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-outline btn-block" style="margin-top:var(--spacing);color:var(--danger);border-color:var(--danger);" onclick="confirmDeleteGroup()">删除课题组</button>
+            `;
+
+            navigateTo('group-manage');
+        }
+
+        function saveGroupAdmin() {
+            const admin = document.getElementById('groupAdmin').value.trim();
+            if (!admin) { alert('请输入管理员姓名'); return; }
+            currentGroup.admin = admin;
+            DataStore.saveGroup(currentGroup);
+            alert('管理员设置成功！');
+            openGroupManage(currentGroup.id);
+        }
+
+        function showAddMemberForm() {
+            const name = prompt('请输入成员姓名：');
+            if (!name || !name.trim()) return;
+            const title = prompt('请输入成员职称（可选）：') || '';
+
+            const role = prompt('请选择权限角色：\n1. 可查看（查看所有实验记录）\n2. 仅查看（仅查看授权项目）\n\n请输入 1 或 2：');
+            const memberRole = (role === '2') ? 'viewer' : 'member';
+
+            currentGroup.members.push({
+                name: name.trim(),
+                title: title.trim(),
+                role: memberRole,
+                addedAt: new Date().toISOString()
+            });
+
+            DataStore.saveGroup(currentGroup);
+            openGroupManage(currentGroup.id);
+        }
+
+        function removeMember(idx) {
+            if (confirm(`确定移除成员"${currentGroup.members[idx].name}"吗？`)) {
+                currentGroup.members.splice(idx, 1);
+                DataStore.saveGroup(currentGroup);
+                openGroupManage(currentGroup.id);
+            }
+        }
+
+        function confirmDeleteGroup() {
+            if (confirm(`确定删除课题组"${currentGroup.name}"吗？\n\n此操作不可撤销。`)) {
+                DataStore.deleteGroup(currentGroup.id);
+                navigationStack = [];
+                switchTab('my-profile');
+                alert('课题组已删除');
+            }
         }
 
         // ===== Initialization =====
         document.addEventListener('DOMContentLoaded', function() {
             DataStore.init();
             renderProjectList();
+
+            // Initialize bottom nav visibility
+            const bottomNav = document.getElementById('bottomNav');
+            if (bottomNav) {
+                bottomNav.classList.remove('hidden');
+            }
         });
     
         function toggleSOPGuide(id) {
